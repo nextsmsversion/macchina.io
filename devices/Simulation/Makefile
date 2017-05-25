@@ -16,7 +16,7 @@ objects = SimulatedSensor SimulatedGNSSSensor BundleActivator
 
 target         = io.macchina.simulation
 target_version = 1
-target_libs    = IoTDevices PocoRemotingNG PocoOSP PocoGeo PocoUtil PocoXML PocoFoundation
+target_libs    = IoTDevices PocoRemotingNG PocoOSP PocoGeo PocoUtil PocoXML PocoFoundation PocoNet
 
 postbuild      = $(SET_LD_LIBRARY_PATH) $(BUNDLE_TOOL) -n$(OSNAME) -a$(OSARCH) -o../bundles Simulation.bndlspec
 
