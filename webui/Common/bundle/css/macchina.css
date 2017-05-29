@@ -46,6 +46,28 @@ ol, ul
 	list-style: none;
 }
 
+ul.navigation li
+{
+	background: #f6f6f6;
+}
+
+ul.navigation li.active
+{
+	background: blue;
+	color: #f6f6f6;
+}
+
+table.list tbody.selection tr
+{
+	background: #f6f6f6;
+}
+
+table.list tbody.selection tr.active
+{
+	background-color: #59d7fe;
+	color: #f6f6f6;
+}
+
 blockquote, q 
 {
 	quotes: none;

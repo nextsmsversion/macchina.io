@@ -1,0 +1,10 @@
+  776  git status
+  777  git add . 
+  778  git commit 
+  779  git commit - m "add ftp to simulatedsensor"
+  780  git commit -m "add ftp to simulatedsensor"
+  781  git remote add origin https://github.com/nextsmsversion/macchina.io.git
+  782  git remote add develop https://github.com/nextsmsversion/macchina.io.git
+  783  git remote -v
+  784  git push 
+

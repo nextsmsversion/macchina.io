@@ -41,24 +41,27 @@
            <div style="clear: both;"></div>
          </div>
         </nav>
+        <!-- 20170529 by sam originally  <div ng-controller="DevicesCtrl" class="groupbox"> -->
         <div ng-controller="DevicesCtrl" class="groupbox">
           <table class="list" style="width: 100%">
             <thead>
               <tr>
-                <th ng-click="setOrderBy('name')" class="list-sortable">Name</th>
+                <!-- 20170529 by sam  <th ng-click="setOrderBy('name')" class="list-sortable">Name</th>  -->
                 <th ng-click="setOrderBy('symbolicName')" class="list-sortable">Symbolic Name</th>
                 <th ng-click="setOrderBy('id')" class="list-sortable">ID</th>
                 <th ng-click="setOrderBy('physicalQuantity')" class="list-sortable">Physical Quantity</th>
-                <th>State/Value</th>
+                <!-- 20170529 by sam  <th>State/Value</th> -->
               </tr>
             </thead>
-            <tbody>
-              <tr ng-repeat="device in devices | orderBy:orderBy track by $index" ng-class-even="'even'" ng-class-odd="'odd'">
-                <td>{{device.name}}</td>
+        	<!--  <input ng-model="states.activeItem" />  -->
+            <tbody class="selection">
+              <tr ng-repeat="device in devices | orderBy:orderBy track by $index"  class="device" 
+	        	ng-class="{'active': device.id == states.activeItem}" ng-click="states.activeItem=device.id" ng-class-even="'even'" ng-class-odd="'odd'">
+                <!-- 20170529 by sam <td>{{device.name}}</td> -->
                 <td>{{device.symbolicName}}</td>
                 <td>{{device.id}}</td>
                 <td>{{device.physicalQuantity}}</td>
-                <td>{{device.displayValue}}</td>
+                <!-- 20170529 by sam  <td>{{device.displayValue}}</td> -->
               </tr>
             </tbody>  
           </table>

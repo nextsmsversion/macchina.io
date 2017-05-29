@@ -117,22 +117,22 @@ public:
 		_pPrefs = ServiceFinder::find<PreferencesService>(pContext);
 
 
+
 		//TODO get the file from FTP
 		//added by sam 20170525 to get the PA mesages through FTP START
 		string localfilename = "/Users/sms/a.txt", remotefilename = "instant.txt";
-		getFile(localfilename, remotefilename,
-				"ftpuser", "ftp123456", "192.168.11.84");
+		getFile(localfilename, remotefilename, "ftpuser", "ftp123456", "192.168.11.84"); //TODO *** solve the problem if the FTP is not ON
 		loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
 		//added by sam 20170525 to get the PA mesages through FTP FINISH
 
 		///added by sam 20170524 for setting timer to update the PA from FTP START
 		{
-			std::string baseKey = "simulation.sensors.";
+			std::string baseKey = "PA.instantMessage.";
 			SimulatedSensor::Params params;
 			params.id = SimulatedSensor::SYMBOLIC_NAME;
-			params.id += "#PA";
+			params.id += std::to_string(1);	//"#PA";
 
-			params.physicalQuantity = "db";// _pPrefs->configuration()->getString(baseKey + ".physicalQuantity", "");
+			params.physicalQuantity = instantMsgMap[1]; //"db";// _pPrefs->configuration()->getString(baseKey + ".physicalQuantity", "");
 			params.physicalUnit     = "db";// _pPrefs->configuration()->getString(baseKey + ".physicalUnit", "");
 			params.initialValue     = -6.0;// _pPrefs->configuration()->getDouble(baseKey + ".initialValue", 0.0);
 			params.delta            = -6.0;// _pPrefs->configuration()->getDouble(baseKey + ".delta", 0.0);
@@ -217,16 +217,40 @@ public:
 			while(getline(myfile,line)){	//for each line of the file
 				//added by sam 20170523 SmsFilePaMgr::ReadInstantMsgConfig for tokenizing the instant file START
 				//Suppose string line = "Instant 01E	Test Message";
+
+				/**decoding of the following example message line:
+				 * Instant 01E	Test Message
+				 */
 				stringstream ss(line);
-				string tmpStr;
-				cerr << "PA Instant Message: " << endl;
+				string tmpStr = "", msgText = "";
+				int instantMsgColumn = 1;
+				int msgID;
 				while (getline(ss,tmpStr,'\t')){
-					cerr << tmpStr << endl;
+					switch (instantMsgColumn){
+						case 1:		//first column
+							msgID = std::stoi(tmpStr.substr(8,2));
+							//cerr << "msgID:<"<< msgID << ">" << endl;
+							break;
+						case 2:		//second column
+							msgText = tmpStr;
+							//cerr << "msgText:["<< msgText << "]" ; cerr << endl;
+							break;
+					}
+					instantMsgColumn ++;
 				}
+				//added by sam 20170525 for saving the instant message
+				//for each row add to the instant message map;
+				instantMsgMap[msgID] = msgText;
 				//added by sam 20170523 SmsFilePaMgr::ReadInstantMsgConfig for tokenizing the instant file FINISH
 			}
 			myfile.close();
 		}
+
+		cerr << "PA Instant Message: " << endl;
+		cerr << "instantMsgMap[1]:" << instantMsgMap[1] << endl;
+		cerr << "instantMsgMap[3]:" << instantMsgMap[3] << endl;
+		cerr << "instantMsgMap[6]:" << instantMsgMap[6] << endl;
+
 		//added by sam 20170523 filestream FINISH
 	}
 
@@ -242,21 +266,30 @@ public:
 	void getFile(	string localfilename, string remotefilename,
 						string USERNAME, string PASSWORD, string HOST){
 			cerr << "LOG: Inside LinearUpdateTimerTask getFile"  << endl;
+			try {
+				/**
+				if(1){				//TODO by check the FTP server is down
+					return;
+				}
+				**/
 			//added by sam 20170518 for establishing FTP session START
-			FTPClientSession session(HOST, FTPClientSession::FTP_PORT, USERNAME, PASSWORD);
-			Path localFilePath(localfilename);
-			ofstream file(localFilePath.toString(), ios::out | ios::binary);	//TODO by sam to set to ASCII??
+			FTPClientSession session(HOST, FTPClientSession::FTP_PORT, USERNAME, PASSWORD); cerr << "LOG: 246"  << endl;
+			Path localFilePath(localfilename);												cerr << "LOG: 247"  << endl;
+			ofstream file(localFilePath.toString(), ios::out | ios::binary);				cerr << "LOG: 248"  << endl;
 			//added by sam 20170518 for establishing FTP session FINISH
 
 			//added by sam 20170522 for trying FTP downloading file to local file START
-			try {
-					session.setFileType(FTPClientSession::TYPE_BINARY);
-					auto& is = session.beginDownload(remotefilename);
-					StreamCopier::copyStream(is, file);
+
+					session.setFileType(FTPClientSession::TYPE_BINARY);						cerr << "LOG: 253"  << endl;
+					auto& is = session.beginDownload(remotefilename);						cerr << "LOG: 254"  << endl;
+					StreamCopier::copyStream(is, file);										cerr << "LOG: 255"  << endl;
 					//session.endDownload();								//TODO throw exception??
 			}
 			catch (FTPException& e) {
 				cerr << "error: " << e.message() << endl;
+			}
+			catch (Exception& e1){
+				cerr << "error: " << e1.message() << endl;
 			}
 			//added by sam 20170522 for trying FTP downloading file to local file FINISH
 	}
@@ -281,6 +314,8 @@ private:
 	BundleContext::Ptr _pContext;
 	PreferencesService::Ptr _pPrefs;
 	std::vector<ServiceRef::Ptr> _serviceRefs;
+
+	std::map<int,string> instantMsgMap;	//added by sam 20170529 for the PA instant message
 };
 
 
