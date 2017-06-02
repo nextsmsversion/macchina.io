@@ -5,7 +5,7 @@ var devicesControllers = angular.module('devicesControllers', []);
 devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval',
   function ($scope, $http, $interval) {
 	$scope.states = {};	//
-	$scope.states.activeItem = 'io.macchina.simulation.sensor1'; //
+	$scope.states.activeItem = 'PA.instantMessage.1'; //
 	
     $scope.devices = [];
     $scope.orderBy = "name";

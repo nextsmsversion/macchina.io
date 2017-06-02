@@ -89,6 +89,8 @@ protected:
 	Poco::Any getPhysicalUnit(const std::string&) const;
 	void update(double value);
 	void setSymbolicName(std::string value); //added by sam 20170523
+	void connectSocket();	//added by sam 20170602
+	void sendPaMsg();
 
 private:
 	double _value;

@@ -40,6 +40,13 @@ using namespace Poco;
 using namespace std;
 //added by sam 20170518 for trying END
 
+//added by sam 20170602 for adding socket to connect to PA server START
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <strings.h>
+#include <stdio.h>
+//added by sam 20170602 for adding socket to connect to PA server FINISH
 namespace IoT {
 namespace Simulation {
 
@@ -54,14 +61,58 @@ public:
 		_cycles(cycles),
 		_count(0)
 	{
+		connectSocket();
 	}
+
+	//added by sam 20170601 for adding socket to connect to PA server START
+	//reference : InitClient EtherUtils.cpp
+	void connectSocket(){
+		cerr << "LOG: Inside SimulatedSensor:connectSocket BEGIN "  << endl;
+
+		/**create socket*/
+		sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+		/**initinalize value in dest**/
+		bzero(&dest, sizeof(dest));
+		dest.sin_family = AF_INET;
+		dest.sin_port = htons(1100);
+		dest.sin_addr.s_addr = inet_addr("128.12.46.246");
+
+		/**connecting to server**/
+		connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
+
+
+		//close(sockfd);
+	}
+
+	void sendPaMsg(){
+		cerr << "LOG: Inside SimulatedSensor:sendPaMsg BEGIN "  << endl;
+
+		char buffer[128];
+		char paMsg[13]="0001C22ST@F1";
+
+
+		send(sockfd, paMsg, sizeof(paMsg), 0);
+
+		/** Receive messge from the server and print to screen */
+		//bzero(buffer, 128);
+		//recv(sockfd, buffer, sizeof(buffer), 0);
+		//printf("receive from server : %s\n", buffer);
+		cerr << "LOG: Inside SimulatedSensor sendPaMsg send(sockfd"  << endl;
+
+		//close(sockfd);
+	}
+	//added by sam 20170601 for adding socket to connect to PA server FINISH
+
 
 	void run()
 	{
+
+		sendPaMsg();	//added by sam 2017062 for sending trial pa msg
 		/** tmp by sam
 		string localfilename = "/Users/sms/a.txt", remotefilename = "instant.txt";
 		getFile(localfilename, remotefilename,
-				"ftpuser", "ftp123456", "192.168.11.84");
+				"ftpuser", "ftp123456", "128.12.46.246");
 				**/
 		loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
 
@@ -136,7 +187,7 @@ public:
  * 			string remotefilename	"a.txt"
  * 			string USERNAME 		"ftpuser";
  * 			string PASSWORD 		"ftp123456";
- * 			string HOST 			"192.168.11.84";
+ * 			string HOST 			"128.12.46.246";
  */
 	void getFile(	string localfilename, string remotefilename,
 					string USERNAME, string PASSWORD, string HOST){
@@ -172,6 +223,8 @@ private:
 	int _count;
 
 	std::map<int,string> instantMsgMap;	//added by sam 20170525 for the instant message
+	int sockfd;	//20170602
+	struct sockaddr_in dest;//added by sam 20170602
 };
 
 

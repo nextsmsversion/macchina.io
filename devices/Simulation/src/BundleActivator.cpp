@@ -55,6 +55,14 @@ using namespace Poco;
 using namespace std;
 //added by sam 20170518 for trying FINISH
 
+//added by sam 20170601 for adding socket to connect to PA server START
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <strings.h>
+#include <stdio.h>
+//added by sam 20170601 for adding socket to connect to PA server FINISH
+
 using Poco::OSP::BundleContext;
 using Poco::OSP::ServiceRegistry;
 using Poco::OSP::ServiceRef;
@@ -110,6 +118,36 @@ public:
 		_serviceRefs.push_back(pServiceRef);
 	}
 
+	//added by sam 20170601 for adding socket to connect to PA server START
+	//reference : InitClient EtherUtils.cpp
+	void connectSocket(){
+		int sockfd;
+		struct sockaddr_in dest;
+		char buffer[128];
+		char paMsg[13]="0001C22ST@F1";	//TODO how come no response 0001C22ST@F1 //"0026C01FN101@6E" "0019C01FN100@6D"
+
+		/**create socket*/
+		sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+		/**initinalize value in dest**/
+		bzero(&dest, sizeof(dest));
+		dest.sin_family = AF_INET;
+		dest.sin_port = htons(1100);
+		dest.sin_addr.s_addr = inet_addr("128.12.46.246");
+
+		/**connecting to server**/
+		connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
+		/** Receive messge from the server and print to screen */
+		//bzero(buffer, 128);
+		//recv(sockfd, buffer, sizeof(buffer), 0);
+		//printf("receive from server : %s\n", buffer);
+
+		send(sockfd, paMsg, sizeof(paMsg), 0);
+
+		//close(sockfd);
+	}
+	//added by sam 20170601 for adding socket to connect to PA server FINISH
+
 	void start(BundleContext::Ptr pContext)
 	{
 		_pTimer = new Poco::Util::Timer;
@@ -117,22 +155,25 @@ public:
 		_pPrefs = ServiceFinder::find<PreferencesService>(pContext);
 
 
+		//TODO by sam reference: BOOL PPOpenObject to connect to PA server as client
+		//connectSocket();//added by sam 20170601 for adding socket to connect to PA server
 
 		//TODO get the file from FTP
 		//added by sam 20170525 to get the PA mesages through FTP START
 		string localfilename = "/Users/sms/a.txt", remotefilename = "instant.txt";
-		getFile(localfilename, remotefilename, "ftpuser", "ftp123456", "192.168.11.84"); //TODO *** solve the problem if the FTP is not ON
+		getFile(localfilename, remotefilename, "ftpuser", "ftp123456", "128.12.46.246"); //TODO *** solve the problem if the FTP is not ON
 		loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
 		//added by sam 20170525 to get the PA mesages through FTP FINISH
 
 		///added by sam 20170524 for setting timer to update the PA from FTP START
+		for(int i=1; i<8 ;i++ )	//added by sam 20170529
 		{
 			std::string baseKey = "PA.instantMessage.";
 			SimulatedSensor::Params params;
-			params.id = SimulatedSensor::SYMBOLIC_NAME;
-			params.id += std::to_string(1);	//"#PA";
+			params.id = "PA.instantMessage.";
+			params.id += std::to_string(i);	//"#PA";
 
-			params.physicalQuantity = instantMsgMap[1]; //"db";// _pPrefs->configuration()->getString(baseKey + ".physicalQuantity", "");
+			params.physicalQuantity = instantMsgMap[i]; //"db";// _pPrefs->configuration()->getString(baseKey + ".physicalQuantity", "");
 			params.physicalUnit     = "db";// _pPrefs->configuration()->getString(baseKey + ".physicalUnit", "");
 			params.initialValue     = -6.0;// _pPrefs->configuration()->getDouble(baseKey + ".initialValue", 0.0);
 			params.delta            = -6.0;// _pPrefs->configuration()->getDouble(baseKey + ".delta", 0.0);
@@ -150,7 +191,7 @@ public:
 			}
 		}
 		//added by sam 20170524 for setting timer to update the PA from FTP FINISH
-
+/**
 		Poco::Util::AbstractConfiguration::Keys keys;
 		_pPrefs->configuration()->keys("simulation.sensors", keys);
 		int index = 0;
@@ -206,6 +247,8 @@ public:
 				pContext->logger().error(Poco::format("Cannot create simulated GNSS sensor: %s", exc.displayText()));
 			}
 		}
+
+		**/
 	}
 	void loadFile(	string localfilename){
 		cerr << "LOG: Inside LinearUpdateTimerTask loadFile"  << endl;
@@ -261,7 +304,7 @@ public:
 	 * 			string remotefilename	"a.txt"
 	 * 			string USERNAME 		"ftpuser";
 	 * 			string PASSWORD 		"ftp123456";
-	 * 			string HOST 			"192.168.11.84";
+	 * 			string HOST 			"128.12.46.246";
 	 */
 	void getFile(	string localfilename, string remotefilename,
 						string USERNAME, string PASSWORD, string HOST){
