@@ -63,7 +63,7 @@ public:
 			/// Mode - linear or random.
 	};
 	
-	SimulatedSensor(const Params& params, Poco::Util::Timer& timer);
+	SimulatedSensor(const Params& params, Poco::Util::Timer& timer, int tmpSockfrd);
 		/// Creates a SimulatedSensor.
 		
 	~SimulatedSensor();
@@ -89,8 +89,6 @@ protected:
 	Poco::Any getPhysicalUnit(const std::string&) const;
 	void update(double value);
 	void setSymbolicName(std::string value); //added by sam 20170523
-	void connectSocket();	//added by sam 20170602
-	void sendPaMsg();
 
 private:
 	double _value;
@@ -103,9 +101,12 @@ private:
 	Poco::Any _physicalQuantity;
 	Poco::Any _physicalUnit;
 	Poco::Util::Timer& _timer;
+
+	int sockfd;	//20170602
 	
 	friend class LinearUpdateTimerTask;
 	friend class RandomUpdateTimerTask;
+
 };
 
 

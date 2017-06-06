@@ -54,61 +54,64 @@ namespace Simulation {
 class LinearUpdateTimerTask: public Poco::Util::TimerTask
 {
 public:
-	LinearUpdateTimerTask(SimulatedSensor& sensor, double initialValue, double delta, int cycles):
+	LinearUpdateTimerTask(SimulatedSensor& sensor, double initialValue, double delta, int cycles, int tmpSockfrd):
 		_sensor(sensor),
 		_initialValue(initialValue),
 		_delta(delta),
 		_cycles(cycles),
-		_count(0)
+		_count(0),
+		_sockfd(tmpSockfrd)
 	{
-		connectSocket();
-	}
 
+	}
+/** by sam 20170606
 	//added by sam 20170601 for adding socket to connect to PA server START
 	//reference : InitClient EtherUtils.cpp
 	void connectSocket(){
 		cerr << "LOG: Inside SimulatedSensor:connectSocket BEGIN "  << endl;
 
-		/**create socket*/
+		///create socket
 		sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-		/**initinalize value in dest**/
+		//initinalize value in dest
 		bzero(&dest, sizeof(dest));
 		dest.sin_family = AF_INET;
 		dest.sin_port = htons(1100);
 		dest.sin_addr.s_addr = inet_addr("128.12.46.246");
 
-		/**connecting to server**/
+		//connecting to server
 		connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
 
 
 		//close(sockfd);
 	}
-
+**/
 	void sendPaMsg(){
 		cerr << "LOG: Inside SimulatedSensor:sendPaMsg BEGIN "  << endl;
+		//added by sam 20170606 BEGIN
+		int flag =1;
+		setsockopt(_sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
+		//added by sam 20170606 FINISH
 
-		char buffer[128];
-		char paMsg[13]="0001C22ST@F1";
+		//char paMsg[16]="0003C22FN100@71";
+		//trial of message replay :
+		//1) SMS connect to PA
+		//2) Press Night On
+		//3) start this server and this message sent to PA to trigger Night Off
+		char paMsg[16]="0003C22FN100@71";
+		paMsg[15] = '\n';
 
-
-		send(sockfd, paMsg, sizeof(paMsg), 0);
-
-		/** Receive messge from the server and print to screen */
-		//bzero(buffer, 128);
-		//recv(sockfd, buffer, sizeof(buffer), 0);
-		//printf("receive from server : %s\n", buffer);
+		send(_sockfd, paMsg, sizeof(paMsg), 0);
 		cerr << "LOG: Inside SimulatedSensor sendPaMsg send(sockfd"  << endl;
-
-		//close(sockfd);
+		//close(_sockfd);
 	}
 	//added by sam 20170601 for adding socket to connect to PA server FINISH
 
 
 	void run()
 	{
+		sendPaMsg();
 
-		sendPaMsg();	//added by sam 2017062 for sending trial pa msg
 		/** tmp by sam
 		string localfilename = "/Users/sms/a.txt", remotefilename = "instant.txt";
 		getFile(localfilename, remotefilename,
@@ -223,8 +226,7 @@ private:
 	int _count;
 
 	std::map<int,string> instantMsgMap;	//added by sam 20170525 for the instant message
-	int sockfd;	//20170602
-	struct sockaddr_in dest;//added by sam 20170602
+	int _sockfd;	//20170602
 };
 
 
@@ -269,7 +271,7 @@ const std::string SimulatedSensor::NAME("Simulated Sensor");
 const std::string SimulatedSensor::SYMBOLIC_NAME("io.macchina.simulation.sensor");
 
 
-SimulatedSensor::SimulatedSensor(const Params& params, Poco::Util::Timer& timer):
+SimulatedSensor::SimulatedSensor(const Params& params, Poco::Util::Timer& timer, int tmpSockfrd):
 	_value(params.initialValue),
 	_valueChangedPeriod(0.0),
 	_valueChangedDelta(0.0),
@@ -296,16 +298,22 @@ SimulatedSensor::SimulatedSensor(const Params& params, Poco::Util::Timer& timer)
 		long interval = 1000/params.updateRate;
 		if (params.mode == SIM_LINEAR)
 		{
-			_timer.scheduleAtFixedRate(new LinearUpdateTimerTask(*this, params.initialValue, params.delta, params.cycles), interval, interval);
+			_timer.scheduleAtFixedRate(new LinearUpdateTimerTask(*this, params.initialValue, params.delta, params.cycles, tmpSockfrd), interval, interval);
 		}
 		else
 		{
 			_timer.scheduleAtFixedRate(new RandomUpdateTimerTask(*this, params.initialValue, params.delta, params.cycles), interval, interval);
 		}
 	}
+
 }
 
-	
+
+//added by sam 20170601 for adding socket to connect to PA server START
+//reference : InitClient EtherUtils.cpp
+
+//added by sam 20170601 for adding socket to connect to PA server FINISH
+
 SimulatedSensor::~SimulatedSensor()
 {
 }

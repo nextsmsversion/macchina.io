@@ -86,11 +86,11 @@ public:
 	{
 	}
 	
-	void createSensor(const SimulatedSensor::Params& params)
+	void createSensor(const SimulatedSensor::Params& params, int tmpSockfrd)
 	{
 		typedef Poco::RemotingNG::ServerHelper<IoT::Devices::Sensor> ServerHelper;
 		
-		Poco::SharedPtr<SimulatedSensor> pSensor = new SimulatedSensor(params, *_pTimer);
+		Poco::SharedPtr<SimulatedSensor> pSensor = new SimulatedSensor(params, *_pTimer, tmpSockfrd);
 		ServerHelper::RemoteObjectPtr pSensorRemoteObject = ServerHelper::createRemoteObject(pSensor, params.id);
 		
 		Properties props;
@@ -120,11 +120,9 @@ public:
 
 	//added by sam 20170601 for adding socket to connect to PA server START
 	//reference : InitClient EtherUtils.cpp
-	void connectSocket(){
-		int sockfd;
+	int connectSocket(){
 		struct sockaddr_in dest;
 		char buffer[128];
-		char paMsg[13]="0001C22ST@F1";	//TODO how come no response 0001C22ST@F1 //"0026C01FN101@6E" "0019C01FN100@6D"
 
 		/**create socket*/
 		sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -142,8 +140,7 @@ public:
 		//recv(sockfd, buffer, sizeof(buffer), 0);
 		//printf("receive from server : %s\n", buffer);
 
-		send(sockfd, paMsg, sizeof(paMsg), 0);
-
+		return sockfd;
 		//close(sockfd);
 	}
 	//added by sam 20170601 for adding socket to connect to PA server FINISH
@@ -156,7 +153,10 @@ public:
 
 
 		//TODO by sam reference: BOOL PPOpenObject to connect to PA server as client
-		//connectSocket();//added by sam 20170601 for adding socket to connect to PA server
+
+		if(sockfd == 0){//added by sam 20170606
+			sockfd = connectSocket();//added by sam 20170601 for adding socket to connect to PA server
+		}
 
 		//TODO get the file from FTP
 		//added by sam 20170525 to get the PA mesages through FTP START
@@ -183,7 +183,7 @@ public:
 
 			try
 			{
-				createSensor(params);
+				createSensor(params, sockfd);
 			}
 			catch (Poco::Exception& exc)
 			{
@@ -359,6 +359,8 @@ private:
 	std::vector<ServiceRef::Ptr> _serviceRefs;
 
 	std::map<int,string> instantMsgMap;	//added by sam 20170529 for the PA instant message
+
+	int sockfd = 0 ;	//added by sam 20170606
 };
 
 
