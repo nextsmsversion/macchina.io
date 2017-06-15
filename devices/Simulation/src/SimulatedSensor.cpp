@@ -47,6 +47,18 @@ using namespace std;
 #include <strings.h>
 #include <stdio.h>
 //added by sam 20170602 for adding socket to connect to PA server FINISH
+
+//added by sam 20170612 START
+#include "Poco/RemotingNG/Deserializer.h"
+#include "Poco/RemotingNG/MethodHandler.h"
+#include "Poco/RemotingNG/Serializer.h"
+#include "Poco/RemotingNG/ServerTransport.h"
+#include "Poco/RemotingNG/TypeDeserializer.h"
+#include "Poco/RemotingNG/TypeSerializer.h"
+
+#include "Poco/RemotingNG/Skeleton.h"
+//added by sam 20170612 FINISH
+
 namespace IoT {
 namespace Simulation {
 
@@ -98,6 +110,7 @@ public:
 		//1) SMS connect to PA
 		//2) Press Night On
 		//3) start this server and this message sent to PA to trigger Night Off
+		//char paMsg[16]="0003C22FN100@71";
 		char paMsg[16]="0003C22FN100@71";
 		paMsg[15] = '\n';
 
@@ -271,6 +284,86 @@ const std::string SimulatedSensor::NAME("Simulated Sensor");
 const std::string SimulatedSensor::SYMBOLIC_NAME("io.macchina.simulation.sensor");
 
 
+//by sam 20170612 TODO make the function specific to SimulatedSensor
+class SimulatedSensorSimulatedTopicsMethodHandler: public Poco::RemotingNG::MethodHandler
+{
+public:
+	void invoke(Poco::RemotingNG::ServerTransport& remoting__trans, Poco::RemotingNG::Deserializer& remoting__deser, Poco::RemotingNG::RemoteObject::Ptr remoting__pRemoteObject)
+	{
+		remoting__staticInitBegin(REMOTING__NAMES);
+		static const std::string REMOTING__NAMES[] = {"simulatedTopics"};
+		remoting__staticInitEnd(REMOTING__NAMES);
+		bool remoting__requestSucceeded = false;
+		try
+		{
+			remoting__deser.deserializeMessageBegin(REMOTING__NAMES[0], Poco::RemotingNG::SerializerBase::MESSAGE_REQUEST);
+			remoting__deser.deserializeMessageEnd(REMOTING__NAMES[0], Poco::RemotingNG::SerializerBase::MESSAGE_REQUEST);
+			//TODO by sam to call the pSensorRemoteObject as in BundleActivator
+			//IoT::Simulation::SimulatedSensor* remoting__pCastedRO = static_cast<IoT::Simulation::SimulatedSensor*>(remoting__pRemoteObject.get());
+			//std::vector < IoT::MQTT::TopicQoS > remoting__return = remoting__pCastedRO->subscribedTopics();
+			remoting__requestSucceeded = true;
+			Poco::RemotingNG::Serializer& remoting__ser = remoting__trans.sendReply(Poco::RemotingNG::SerializerBase::MESSAGE_REPLY);
+			remoting__staticInitBegin(REMOTING__REPLY_NAME);
+			static const std::string REMOTING__REPLY_NAME("simulatedTopicsReply");
+			remoting__staticInitEnd(REMOTING__REPLY_NAME);
+			remoting__ser.serializeMessageBegin(REMOTING__REPLY_NAME, Poco::RemotingNG::SerializerBase::MESSAGE_REPLY);
+			//Poco::RemotingNG::TypeSerializer<std::vector < IoT::MQTT::TopicQoS > >::serialize(Poco::RemotingNG::SerializerBase::RETURN_PARAM, remoting__return, remoting__ser);
+			remoting__ser.serializeMessageEnd(REMOTING__REPLY_NAME, Poco::RemotingNG::SerializerBase::MESSAGE_REPLY);
+		}
+		catch (Poco::Exception& e)
+		{
+			if (!remoting__requestSucceeded)
+			{
+				Poco::RemotingNG::Serializer& remoting__ser = remoting__trans.sendReply(Poco::RemotingNG::SerializerBase::MESSAGE_FAULT);
+				remoting__ser.serializeFaultMessage(REMOTING__NAMES[0], e);
+			}
+		}
+		catch (std::exception& e)
+		{
+			if (!remoting__requestSucceeded)
+			{
+				Poco::RemotingNG::Serializer& remoting__ser = remoting__trans.sendReply(Poco::RemotingNG::SerializerBase::MESSAGE_FAULT);
+				Poco::Exception exc(e.what());
+				remoting__ser.serializeFaultMessage(REMOTING__NAMES[0], exc);
+			}
+		}
+		catch (...)
+		{
+			if (!remoting__requestSucceeded)
+			{
+				Poco::RemotingNG::Serializer& remoting__ser = remoting__trans.sendReply(Poco::RemotingNG::SerializerBase::MESSAGE_FAULT);
+				Poco::Exception exc("Unknown Exception");
+				remoting__ser.serializeFaultMessage(REMOTING__NAMES[0], exc);
+			}
+		}
+	}
+
+};
+
+/**by sam 20170612
+**/
+class SimulatedSensorSkeleton: public Poco::RemotingNG::Skeleton
+	/// The interface for MQTT clients.
+	///
+	/// Implementations are expected to receive their client ID and
+	/// server URI via an implementation defined configuration mechanism.
+	/// Once configured, a MQTTClient always uses the same client ID and
+	/// connects to the same server. A MQTT client should automatically
+	/// attempt to reconnect if the connection to the server is lost.
+{
+	public:
+		SimulatedSensorSkeleton(){
+			addMethodHandler("simulatedTopics", new IoT::Simulation::SimulatedSensorSimulatedTopicsMethodHandler);
+		}
+			/// Creates a MQTTClientSkeleton.
+
+		virtual ~SimulatedSensorSkeleton();
+			/// Destroys a MQTTClientSkeleton.
+
+		virtual const Poco::RemotingNG::Identifiable::TypeId& remoting__typeId() const;
+
+		static const std::string DEFAULT_NS;
+};
 SimulatedSensor::SimulatedSensor(const Params& params, Poco::Util::Timer& timer, int tmpSockfrd):
 	_value(params.initialValue),
 	_valueChangedPeriod(0.0),

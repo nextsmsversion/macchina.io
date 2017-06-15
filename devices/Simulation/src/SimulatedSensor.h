@@ -102,7 +102,6 @@ private:
 	Poco::Any _physicalUnit;
 	Poco::Util::Timer& _timer;
 
-	int sockfd;	//20170602
 	
 	friend class LinearUpdateTimerTask;
 	friend class RandomUpdateTimerTask;
