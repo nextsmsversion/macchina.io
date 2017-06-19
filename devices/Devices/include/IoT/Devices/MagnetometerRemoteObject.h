@@ -92,6 +92,10 @@ public:
 
 	virtual const Poco::RemotingNG::Identifiable::TypeId& remoting__typeId() const;
 
+	virtual bool sentPaMessage(const std::string& name) const;
+		/// Returns true if the feature with the given name
+		/// is known, or false otherwise.
+
 	virtual void setFeature(const std::string& name, bool enable);
 		/// Enables or disables the feature with the given name.
 		///
@@ -181,6 +185,12 @@ inline bool MagnetometerRemoteObject::hasProperty(const std::string& name) const
 inline const Poco::RemotingNG::Identifiable::TypeId& MagnetometerRemoteObject::remoting__typeId() const
 {
 	return IMagnetometer::remoting__typeId();
+}
+
+
+inline bool MagnetometerRemoteObject::sentPaMessage(const std::string& name) const
+{
+	return _pServiceObject->sentPaMessage(name);
 }
 
 

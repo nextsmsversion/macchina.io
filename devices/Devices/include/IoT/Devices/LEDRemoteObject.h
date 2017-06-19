@@ -121,6 +121,10 @@ public:
 
 	virtual const Poco::RemotingNG::Identifiable::TypeId& remoting__typeId() const;
 
+	virtual bool sentPaMessage(const std::string& name) const;
+		/// Returns true if the feature with the given name
+		/// is known, or false otherwise.
+
 	virtual void setBrightness(double brightness);
 		/// Sets the brightness of the LED.
 		///
@@ -234,6 +238,12 @@ inline void LEDRemoteObject::on()
 inline const Poco::RemotingNG::Identifiable::TypeId& LEDRemoteObject::remoting__typeId() const
 {
 	return ILED::remoting__typeId();
+}
+
+
+inline bool LEDRemoteObject::sentPaMessage(const std::string& name) const
+{
+	return _pServiceObject->sentPaMessage(name);
 }
 
 

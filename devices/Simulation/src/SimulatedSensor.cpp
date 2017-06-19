@@ -99,7 +99,7 @@ public:
 	}
 **/
 	void sendPaMsg(){
-		cerr << "LOG: Inside SimulatedSensor:sendPaMsg BEGIN "  << endl;
+		//cerr << "LOG: Inside SimulatedSensor:sendPaMsg BEGIN "  << endl;
 		//added by sam 20170606 BEGIN
 		int flag =1;
 		setsockopt(_sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
@@ -115,7 +115,7 @@ public:
 		paMsg[15] = '\n';
 
 		send(_sockfd, paMsg, sizeof(paMsg), 0);
-		cerr << "LOG: Inside SimulatedSensor sendPaMsg send(sockfd"  << endl;
+		//cerr << "LOG: Inside SimulatedSensor sendPaMsg send(sockfd"  << endl;
 		//close(_sockfd);
 	}
 	//added by sam 20170601 for adding socket to connect to PA server FINISH
@@ -150,7 +150,7 @@ public:
 		}
 	}
 	void loadFile(	string localfilename){
-		cerr << "LOG: Inside LinearUpdateTimerTask loadFile"  << endl;
+		//cerr << "LOG: Inside LinearUpdateTimerTask loadFile"  << endl;
 
 		//added by sam 20170523 filestream START
 		string line;
@@ -188,10 +188,10 @@ public:
 			myfile.close();
 		}
 
-		cerr << "PA Instant Message: " << endl;
-		cerr << "instantMsgMap[1]:" << instantMsgMap[1] << endl;
-		cerr << "instantMsgMap[3]:" << instantMsgMap[3] << endl;
-		cerr << "instantMsgMap[6]:" << instantMsgMap[6] << endl;
+		//cerr << "PA Instant Message: " << endl;
+		//cerr << "instantMsgMap[1]:" << instantMsgMap[1] << endl;
+		//cerr << "instantMsgMap[3]:" << instantMsgMap[3] << endl;
+		//cerr << "instantMsgMap[6]:" << instantMsgMap[6] << endl;
 
 		//added by sam 20170523 filestream FINISH
 	}
@@ -207,7 +207,7 @@ public:
  */
 	void getFile(	string localfilename, string remotefilename,
 					string USERNAME, string PASSWORD, string HOST){
-		cerr << "LOG: Inside LinearUpdateTimerTask getFile"  << endl;
+		//cerr << "LOG: Inside LinearUpdateTimerTask getFile"  << endl;
 		//added by sam 20170518 for establishing FTP session START
 		FTPClientSession session(HOST, FTPClientSession::FTP_PORT, USERNAME, PASSWORD);
 		Path localFilePath(localfilename);
@@ -384,7 +384,7 @@ SimulatedSensor::SimulatedSensor(const Params& params, Poco::Util::Timer& timer,
 	addProperty("name", &SimulatedSensor::getName);
 	addProperty("physicalQuantity", &SimulatedSensor::getPhysicalQuantity);
 	addProperty("physicalUnit", &SimulatedSensor::getPhysicalUnit);
-	
+	addProperty("PaMessage", &SimulatedSensor::PaMessage);
 
 	if (params.updateRate > 0)
 	{
@@ -524,6 +524,11 @@ Poco::Any SimulatedSensor::getPhysicalQuantity(const std::string&) const
 Poco::Any SimulatedSensor::getPhysicalUnit(const std::string&) const
 {
 	return _physicalUnit;
+}
+
+Poco::Any SimulatedSensor::PaMessage(const std::string&) const
+{
+	return Poco::NumberFormatter::format(value(), 2, 3);
 }
 
 

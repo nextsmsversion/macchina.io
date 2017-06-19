@@ -92,6 +92,10 @@ public:
 
 	virtual const Poco::RemotingNG::Identifiable::TypeId& remoting__typeId() const;
 
+	virtual bool sentPaMessage(const std::string& name) const;
+		/// Returns true if the feature with the given name
+		/// is known, or false otherwise.
+
 	virtual void setFeature(const std::string& name, bool enable);
 		/// Enables or disables the feature with the given name.
 		///
@@ -181,6 +185,12 @@ inline bool AccelerometerRemoteObject::hasProperty(const std::string& name) cons
 inline const Poco::RemotingNG::Identifiable::TypeId& AccelerometerRemoteObject::remoting__typeId() const
 {
 	return IAccelerometer::remoting__typeId();
+}
+
+
+inline bool AccelerometerRemoteObject::sentPaMessage(const std::string& name) const
+{
+	return _pServiceObject->sentPaMessage(name);
 }
 
 

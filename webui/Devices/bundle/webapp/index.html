@@ -51,6 +51,7 @@
                 <th ng-click="setOrderBy('id')" class="list-sortable">ID</th>
                 <th ng-click="setOrderBy('physicalQuantity')" class="list-sortable">Physical Quantity</th>
                 <!-- 20170529 by sam  <th>State/Value</th> -->
+                <th>TODO sentPaMessage()</th>
               </tr>
             </thead>
         	<input ng-model="states.activeItem" type = "text" id="text" visibility="hidden"/> 
@@ -62,11 +63,12 @@
                 <td>{{device.id}}</td>
                 <td>{{device.physicalQuantity}}</td>
                 <!-- 20170529 by sam  <td>{{device.displayValue}}</td> -->
+                <td>{{device.PaMessage}}</td>
               </tr>
             </tbody>
           </table>
           <!-- 20170607 by sam  TODO trigger an action in C++ by addMethodHandler -->
-          <button type="submit" value ="submit" onclick="alert(document.getElementById('text').value);">Record</button>
+          <button ng-click="sendPaMessage()">Record</button>
         </div>
       </div>
     </div>

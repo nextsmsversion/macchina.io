@@ -14,11 +14,19 @@ for (var i = 0; i < deviceRefs.length; i++)
 	var deviceRef = deviceRefs[i];
 	var device = deviceRef.instance();
 	if (device)
-	{
+	{ 
 		var deviceInfo = {};
 		deviceInfo.id = deviceRef.name;
 		deviceInfo.name = device.getPropertyString("name");
 		deviceInfo.symbolicName = device.getPropertyString("symbolicName");
+		
+		deviceInfo.PaMessage = "1"; //while no device.hdop();	//by sam 200170619 
+		/**"PaMessage" **/
+		if (device.hasProperty("PaMessage"))
+		{
+			deviceInfo.PaMessage = device.getPropertyString("PaMessage");
+			device.sentPaMessage("PA");
+		}
 		if (device.hasProperty("physicalQuantity"))
 		{
 			deviceInfo.physicalQuantity = device.getPropertyString("physicalQuantity");

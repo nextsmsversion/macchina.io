@@ -92,6 +92,10 @@ public:
 	IoT::Devices::Rotation rotation() const;
 		/// Returns the most recently measured rotation values.
 
+	virtual bool sentPaMessage(const std::string& name) const;
+		/// Returns true if the feature with the given name
+		/// is known, or false otherwise.
+
 	virtual void setFeature(const std::string& name, bool enable);
 		/// Enables or disables the feature with the given name.
 		///
@@ -181,6 +185,12 @@ inline const Poco::RemotingNG::Identifiable::TypeId& GyroscopeRemoteObject::remo
 inline IoT::Devices::Rotation GyroscopeRemoteObject::rotation() const
 {
 	return _pServiceObject->rotation();
+}
+
+
+inline bool GyroscopeRemoteObject::sentPaMessage(const std::string& name) const
+{
+	return _pServiceObject->sentPaMessage(name);
 }
 
 

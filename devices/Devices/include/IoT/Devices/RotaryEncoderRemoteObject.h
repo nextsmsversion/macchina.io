@@ -99,6 +99,10 @@ public:
 		/// Returns the current value of the counter and
 		/// sets the counter to 0.
 
+	virtual bool sentPaMessage(const std::string& name) const;
+		/// Returns true if the feature with the given name
+		/// is known, or false otherwise.
+
 	virtual void setFeature(const std::string& name, bool enable);
 		/// Enables or disables the feature with the given name.
 		///
@@ -202,6 +206,12 @@ inline const Poco::RemotingNG::Identifiable::TypeId& RotaryEncoderRemoteObject::
 inline Poco::Int32 RotaryEncoderRemoteObject::reset()
 {
 	return _pServiceObject->reset();
+}
+
+
+inline bool RotaryEncoderRemoteObject::sentPaMessage(const std::string& name) const
+{
+	return _pServiceObject->sentPaMessage(name);
 }
 
 

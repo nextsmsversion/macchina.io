@@ -167,6 +167,10 @@ public:
 
 	virtual const Poco::RemotingNG::Identifiable::TypeId& remoting__typeId() const;
 
+	virtual bool sentPaMessage(const std::string& name) const;
+		/// Returns true if the feature with the given name
+		/// is known, or false otherwise.
+
 	virtual void setFeature(const std::string& name, bool enable);
 		/// Enables or disables the feature with the given name.
 		///
@@ -302,6 +306,12 @@ inline void SerialDeviceRemoteObject::reconfigure(int baudRate, const std::strin
 inline const Poco::RemotingNG::Identifiable::TypeId& SerialDeviceRemoteObject::remoting__typeId() const
 {
 	return ISerialDevice::remoting__typeId();
+}
+
+
+inline bool SerialDeviceRemoteObject::sentPaMessage(const std::string& name) const
+{
+	return _pServiceObject->sentPaMessage(name);
 }
 
 

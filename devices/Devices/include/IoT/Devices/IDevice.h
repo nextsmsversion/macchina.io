@@ -96,6 +96,10 @@ public:
 	static const Poco::RemotingNG::Identifiable::TypeId& remoting__typeId();
 		/// Returns the TypeId of the class.
 
+	virtual bool sentPaMessage(const std::string& name) const = 0;
+		/// Returns true if the feature with the given name
+		/// is known, or false otherwise.
+
 	virtual void setFeature(const std::string& name, bool enable) = 0;
 		/// Enables or disables the feature with the given name.
 		///

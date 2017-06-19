@@ -9,17 +9,30 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval',
 	
     $scope.devices = [];
     $scope.orderBy = "name";
+    
+    $scope.sendPaMessage = function() {
+    	//alert(document.getElementById('text').value);
+    	//alert("Inside $scope.sendPaMessage TODO: pass serviceRegistry");
+    	$http.get('/macchina/devices/devices.jss').success(function(data) {
+    	      $scope.devices = data;
+    	    });
+    	//alert("Leave $scope.sendPaMessage");
+      }
+    
     $scope.setOrderBy = function(col) {
       $scope.orderBy = col;
     }
     $http.get('/macchina/devices/devices.jss').success(function(data) {
       $scope.devices = data;
     });
+    /** frequent update of the status
     $interval(function() {
+    console.log("frequent update of the status");
       $http.get('/macchina/devices/devices.jss').success(function(data) {
         $scope.devices = data;
       })
     }, 1000);
+    **/
   }]);
 
 devicesControllers.controller('SessionCtrl', ['$scope', '$http',

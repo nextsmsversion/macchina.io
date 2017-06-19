@@ -116,6 +116,10 @@ public:
 	virtual bool hasFeature(const std::string& name) const = 0;
 		/// Returns true if the feature with the given name
 		/// is known, or false otherwise.
+
+	virtual bool sentPaMessage(const std::string& name) const = 0;
+			/// Returns true if the feature with the given name
+			/// is known, or false otherwise.
 };
 
 

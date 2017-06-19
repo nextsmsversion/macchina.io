@@ -99,6 +99,10 @@ public:
 
 	virtual const Poco::RemotingNG::Identifiable::TypeId& remoting__typeId() const;
 
+	virtual bool sentPaMessage(const std::string& name) const;
+		/// Returns true if the feature with the given name
+		/// is known, or false otherwise.
+
 	virtual void set(bool state);
 		/// Sets the state of an output pin to the given state.
 
@@ -188,6 +192,12 @@ inline bool IORemoteObject::hasProperty(const std::string& name) const
 inline const Poco::RemotingNG::Identifiable::TypeId& IORemoteObject::remoting__typeId() const
 {
 	return IIO::remoting__typeId();
+}
+
+
+inline bool IORemoteObject::sentPaMessage(const std::string& name) const
+{
+	return _pServiceObject->sentPaMessage(name);
 }
 
 

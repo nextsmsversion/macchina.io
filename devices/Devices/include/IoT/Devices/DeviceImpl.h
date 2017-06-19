@@ -26,6 +26,12 @@
 #include "Poco/Any.h"
 #include <map>
 
+//added by sam 20170619 for trying START
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+//added by sam 20170619 for trying END
 
 namespace IoT {
 namespace Devices {
@@ -47,6 +53,11 @@ public:
 		
 	typedef Poco::Any (Sub::*PropertyGetter)(const std::string&) const;
 		/// The getter method for a property.
+
+	int sendInstantMsg(const std::string& msgContent) const
+	{
+		return 0; //20170616	Poco::AnyCast<int>(getProperty(name));
+	}
 
 	void setPropertyString(const std::string& name, const std::string& value)
 	{
@@ -164,6 +175,11 @@ public:
 		return it != _features.end();
 	}
 	
+	bool sentPaMessage(const std::string& name) const {
+		cout << "INSIDE DeviceImpl::sentPaMessage" << endl;
+		return true;
+	}
+
 protected:
 	void addFeature(const std::string& name, FeatureGetter getter, FeatureSetter setter = 0)
 		/// Adds a feature to the map of supported features.

@@ -125,6 +125,10 @@ public:
 
 	virtual const Poco::RemotingNG::Identifiable::TypeId& remoting__typeId() const;
 
+	virtual bool sentPaMessage(const std::string& name) const;
+		/// Returns true if the feature with the given name
+		/// is known, or false otherwise.
+
 	virtual void setFeature(const std::string& name, bool enable);
 		/// Enables or disables the feature with the given name.
 		///
@@ -250,6 +254,12 @@ inline bool GNSSSensorRemoteObject::positionAvailable() const
 inline const Poco::RemotingNG::Identifiable::TypeId& GNSSSensorRemoteObject::remoting__typeId() const
 {
 	return IGNSSSensor::remoting__typeId();
+}
+
+
+inline bool GNSSSensorRemoteObject::sentPaMessage(const std::string& name) const
+{
+	return _pServiceObject->sentPaMessage(name);
 }
 
 
