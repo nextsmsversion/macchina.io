@@ -403,6 +403,15 @@ void WebServerDispatcher::logRequest(const Poco::Net::HTTPServerRequest& request
 {
 	std::string reqText(request.getMethod());
 	reqText += ' ';
+	reqText += request.clientAddress().toString();			//added by sam 20170621
+	reqText += ' ';											//added by sam 20170621
+	if (request.has("symbolicName")){
+		reqText += request.get("symbolicName", "");			//added by sam 20170621
+		reqText += ' ';										//added by sam 20170621
+	}else{
+		reqText += "No symbolicName???";						//added by sam 20170621
+		reqText += ' ';
+	}
 	reqText += request.getURI();
 	reqText += ' ';
 	reqText += request.getVersion();

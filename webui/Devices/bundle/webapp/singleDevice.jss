@@ -9,9 +9,9 @@ if (!session || !session.authenticated)
 var devices = [];
 
 var deviceRefs = serviceRegistry.find('io.macchina.device != ""');
-for (var i = 0; i < deviceRefs.length; i++)
+//by sam 20170619 for (var i = 0; i < deviceRefs.length; i++)
 {
-	var deviceRef = deviceRefs[i];
+	var deviceRef = deviceRefs[0];	//by sam from i to 0 for tmp testing 
 	var device = deviceRef.instance();
 	if (device)
 	{ 
@@ -25,6 +25,7 @@ for (var i = 0; i < deviceRefs.length; i++)
 		if (device.hasProperty("PaMessage"))
 		{
 			deviceInfo.PaMessage = device.getPropertyString("PaMessage");
+			device.sentPaMessage("PA");
 		}
 		if (device.hasProperty("physicalQuantity"))
 		{

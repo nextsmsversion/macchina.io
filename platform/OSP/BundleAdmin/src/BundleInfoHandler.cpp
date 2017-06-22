@@ -15,6 +15,10 @@
 #include "Poco/NumberFormatter.h"
 #include <vector>
 
+//added by sam 20170620 for cout START
+#include <iostream>
+using namespace std;
+//added by sam 20170620 for cout END
 
 using Poco::OSP::BundleContext;
 using Poco::OSP::Bundle;
@@ -36,7 +40,6 @@ BundleInfoHandler::~BundleInfoHandler()
 void BundleInfoHandler::run()
 {
 	std::string symbolicName = form().get("symbolicName");
-	
 	Bundle::Ptr pBundle = context()->findBundle(symbolicName);
 	if (pBundle)
 	{
@@ -136,7 +139,11 @@ void BundleInfoHandler::actions(Poco::OSP::Bundle::Ptr pBundle)
 
 bool BundleInfoHandler::performAction(Poco::OSP::Bundle::Ptr pBundle, const std::string& action)
 {
-	if (action == "resolve")
+	if (action == "paMsg")	//by sam 20170620
+	{
+		cerr << "paMsg is received" << endl;
+	}
+	else if (action == "resolve")
 	{
 		pBundle->resolve();
 	}

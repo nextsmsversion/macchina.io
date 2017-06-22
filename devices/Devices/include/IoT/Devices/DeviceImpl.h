@@ -176,7 +176,7 @@ public:
 	}
 	
 	bool sentPaMessage(const std::string& name) const {
-		cout << "INSIDE DeviceImpl::sentPaMessage" << endl;
+		cout << "INSIDE DeviceImpl::sentPaMessage received:[" << name << "]"<< endl;
 		return true;
 	}
 
