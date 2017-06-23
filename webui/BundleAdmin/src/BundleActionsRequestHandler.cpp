@@ -132,9 +132,10 @@ void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& re
 	}
 	std::string testAction = form.get("action", "xxx");//by sam 20170623
 	std::string testBundle = form.get("bundle", "xxx");//by sam 20170623
+	std::string testInput = form.get("input", "xxx");//by sam 20170623
 		if (context()->logger().information())	//by sam 20170623 request from extensions.xml -> BundleActionsRequestHandlerFactory
 		{
-			context()->logger().information(Poco::format("Performing action %s on bundle %s.", testAction, testBundle)); //by sam
+			context()->logger().information(Poco::format("BundleActionsRequestHandler.cpp Performing action %s on bundle %s MsgType: %s.", testAction, testBundle, testInput)); //by sam
 		}
 	Poco::OSP::Bundle::Ptr pBundle = installHandler.bundle();
 	if (pBundle)

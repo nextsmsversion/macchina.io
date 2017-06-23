@@ -54,7 +54,7 @@
                 <th>TODO sentPaMessage()</th>
               </tr>
             </thead>
-        	<input ng-model="states.activeItem" type = "text" id="text" visibility="hidden"/> 
+        	<input ng-model="states.activeItem" type = "text" id="msgIDTxt" visibility="hidden"/> 
             <tbody class="selection">
               <tr ng-repeat="device in devices | orderBy:orderBy track by $index"  class="device" 
 	        	ng-class="{'active': device.id == states.activeItem}" ng-click="states.activeItem=device.id" ng-class-even="'even'" ng-class-odd="'odd'">
@@ -68,7 +68,7 @@
             </tbody>
           </table>
           <!-- 20170607 by sam  TODO trigger an action in C++ by addMethodHandler -->
-          <button ng-click="sendPaMessage()">Record</button>
+          <button ng-click="sendPaMessage(states.activeItem)">Record</button>
         </div>
       </div>
     </div>

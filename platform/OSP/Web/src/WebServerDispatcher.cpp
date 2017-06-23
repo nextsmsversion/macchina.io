@@ -407,27 +407,7 @@ void WebServerDispatcher::logRequest(const Poco::Net::HTTPServerRequest& request
 	reqText += ' ';
 	reqText += request.clientAddress().toString();			//added by sam 20170621
 	reqText += ' ';											//added by sam 20170621
-	if (request.has("symbolicName")){
-		reqText += request.get("symbolicName", "");			//added by sam 20170621
-		reqText += ' ';										//added by sam 20170621
-	}else{
-		reqText += "No symbolicName???";						//added by sam 20170621
-		reqText += ' ';
-	}
-	reqText += ':';
-	//added by sam 20170623b
-	std::vector< std::pair < std::string, std::string > > queryParams = ((URI)request.getURI()).getQueryParameters();
-	for(const auto& queryParam : queryParams){
-	//for(auto itr = queryParams.cbegin(); itr != queryParams.cend(); ++itr){
-		reqText += queryParam.first;
-		reqText += ' ';
-		reqText += queryParam.second;
-	}
-	reqText += ':';
-	//added by sam 20170623b
-
 	reqText += ((URI)request.getURI()).toString();	 	//added by sam 20170623 file:///Users/sms/nextsmsversion/macchinadoc/docs/Poco.URI.html#18804
-
 	reqText += ' ';
 	reqText += request.getVersion();
 	

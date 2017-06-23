@@ -5,8 +5,8 @@ var devicesControllers = angular.module('devicesControllers', []);
 devicesControllers.service('DeviceService', ['$http',
   function($http) {
 	//var inputdata = $.param({action : "msgPa", bundle : "io.bundle.devices"});
-    this.post = function(inputAction, inputSymbolicName) {
-    	var inputdata = $.param({action : inputAction, bundle : inputSymbolicName});
+    this.post = function(inputAction, inputSymbolicName, inputId) {
+    	var inputdata = $.param({action : inputAction, bundle : inputSymbolicName, input : inputId});
     	var request =     		  
     	{ 
 		        method: "POST", 
@@ -21,12 +21,12 @@ devicesControllers.service('DeviceService', ['$http',
     		.error(function() {});
     };
 
-    this.paMsg = function(symbolicName) {
-      this.post('paMsg', symbolicName);
+    this.paMsg = function(symbolicName, inputId) {
+      this.post('paMsg', symbolicName, inputId);
     };
     this.simplepaMsg = function() {
         //alert("inside the simplepaMsg");
-        this.post('paMsg', 'io');
+        this.post('paMsg', 'io.macchina.instant', '02');
      };
   }
 ]);
@@ -39,17 +39,10 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
     $scope.devices = [];
     $scope.orderBy = "name";
     
-    $scope.sendPaMessage = function() {
-        //alert("before the DeviceService.paMsg");
-    	DeviceService.paMsg('io.macchina.paMsg');
+    $scope.sendPaMessage = function(msgId) {
+    	alert(msgId);
+    	DeviceService.paMsg('io.macchina.sched', msgId);
         DeviceService.simplepaMsg();
-        //alert("after the DeviceService.paMsg");
-    	/**
-    	$http.get('/macchina/devices/singleDevice.jss').success(function(data) {
-    	      //tmp by sam $scope.devices = data;
-    	    });
-    	**/
-    	//alert("Leave $scope.sendPaMessage");
       }
     
     $scope.setOrderBy = function(col) {
