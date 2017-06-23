@@ -80,6 +80,10 @@ BundleActionsRequestHandler::BundleActionsRequestHandler(Poco::OSP::BundleContex
 
 void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
 {
+	if (context()->logger().information())	//by sam 20170623 request from extensions.xml -> BundleActionsRequestHandlerFactory
+	{
+			context()->logger().information("INSIDE (by sam) BundleActionsRequestHandler::handleRequest"); //by sam
+	}
 	Poco::OSP::Web::WebSession::Ptr pSession;
 	{
 		Poco::OSP::ServiceRef::Ptr pWebSessionManagerRef = context()->registry().findByName(Poco::OSP::Web::WebSessionManager::SERVICE_NAME);
@@ -91,6 +95,10 @@ void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& re
 	}
 	if (!Utility::isAuthenticated(pSession, response)) return;
 
+	if (context()->logger().information())	//by sam 20170623 request from extensions.xml -> BundleActionsRequestHandlerFactory
+	{
+			context()->logger().information("INSIDE (by sam) BundleActionsRequestHandler::handleRequest isAuthenticated"); //by sam
+	}
 	std::string username = pSession->getValue<std::string>("username");
 	Poco::OSP::Auth::AuthService::Ptr pAuthService = Poco::OSP::ServiceFinder::findByName<Poco::OSP::Auth::AuthService>(context(), "osp.auth");
 
@@ -102,6 +110,11 @@ void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& re
 		return;
 	}
 	
+	if (context()->logger().information())	//by sam 20170623 request from extensions.xml -> BundleActionsRequestHandlerFactory
+	{
+			context()->logger().information("INSIDE (by sam) BundleActionsRequestHandler::handleRequest bundleAdmin OK"); //by sam
+	}
+
 	std::string symbolicName;
 	std::string bundleState;
 	std::string error;
@@ -117,6 +130,12 @@ void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& re
 		error = exc.displayText();
 		context()->logger().error(Poco::format("Installing or upgrading bundle failed: %s", error));
 	}
+	std::string testAction = form.get("action", "xxx");//by sam 20170623
+	std::string testBundle = form.get("bundle", "xxx");//by sam 20170623
+		if (context()->logger().information())	//by sam 20170623 request from extensions.xml -> BundleActionsRequestHandlerFactory
+		{
+			context()->logger().information(Poco::format("Performing action %s on bundle %s.", testAction, testBundle)); //by sam
+		}
 	Poco::OSP::Bundle::Ptr pBundle = installHandler.bundle();
 	if (pBundle)
 	{
@@ -159,6 +178,10 @@ void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& re
 		if (pBundle)
 		{
 			context()->logger().debug(Poco::format("Performing action %s on bundle %s.", action, pBundle->symbolicName()));
+			if (context()->logger().information())	//by sam 20170623
+			{
+					context()->logger().information(Poco::format("Performing action %s on bundle %s.", action, pBundle->symbolicName())); //by sam
+			}
 			try
 			{
 				if (action == "start")

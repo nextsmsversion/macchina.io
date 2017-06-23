@@ -453,7 +453,7 @@ void BundleLoader::stopBundle(Bundle* pBundle)
 		}
 		if (_logger.information())
 		{
-			_logger.information(std::string("Bundle ") + pBundle->symbolicName() + " stopped");
+			_logger.information(std::string("Bundle ") + pBundle->symbolicName() + " stopped!!!"); //by sam
 		}
 	}
 	else throw BundleException("The bundle loader does not know the bundle", pBundle->symbolicName());

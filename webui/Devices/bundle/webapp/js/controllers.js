@@ -4,39 +4,29 @@ var devicesControllers = angular.module('devicesControllers', []);
 
 devicesControllers.service('DeviceService', ['$http',
   function($http) {
-    this.post = function(action, symbolicName) {
-      $http({ 
-        method: "POST", 
-        url: "/macchina/bundles/actions.json",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        transformRequest: function(obj) {
-          var str = [];
-          for (var p in obj) {
-            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-          }
-          return str.join("&");
-        },
-        data: {
-            action: action,
-            symbolicName: symbolicName
-        }
-      })
-      .success(function(data) {
-    	  
-      })
-      .error(function() {
-    	  	
-      });
+	//var inputdata = $.param({action : "msgPa", bundle : "io.bundle.devices"});
+    this.post = function(inputAction, inputSymbolicName) {
+    	var inputdata = $.param({action : inputAction, bundle : inputSymbolicName});
+    	var request =     		  
+    	{ 
+		        method: "POST", 
+		        url: "/macchina/bundles/actions.json",
+		        headers: {
+		          "Content-Type": "application/x-www-form-urlencoded"
+		        },
+		        data: inputdata
+    	};
+    	$http(request)
+    		.success(function() {})
+    		.error(function() {});
     };
 
     this.paMsg = function(symbolicName) {
-      this.post("paMsg", symbolicName);
+      this.post('paMsg', symbolicName);
     };
     this.simplepaMsg = function() {
         //alert("inside the simplepaMsg");
-        this.post("paMsg", "io");
+        this.post('paMsg', 'io');
      };
   }
 ]);
@@ -50,10 +40,8 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
     $scope.orderBy = "name";
     
     $scope.sendPaMessage = function() {
-    	//alert(document.getElementById('text').value);
-    	//window.alert("this.paMsg");
         //alert("before the DeviceService.paMsg");
-    	//DeviceService.paMsg($scope.bundle.symbolicName);
+    	DeviceService.paMsg('io.macchina.paMsg');
         DeviceService.simplepaMsg();
         //alert("after the DeviceService.paMsg");
     	/**

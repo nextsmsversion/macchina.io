@@ -43,6 +43,8 @@
 #include <memory>
 #include <limits>
 
+#include "Poco/URI.h"		//added by sam 20170623
+#include <vector>			//added by sam 20170623b
 
 using Poco::OSP::Auth::AuthService;
 using Poco::OSP::ServiceRegistry;
@@ -412,7 +414,20 @@ void WebServerDispatcher::logRequest(const Poco::Net::HTTPServerRequest& request
 		reqText += "No symbolicName???";						//added by sam 20170621
 		reqText += ' ';
 	}
-	reqText += request.getURI();
+	reqText += ':';
+	//added by sam 20170623b
+	std::vector< std::pair < std::string, std::string > > queryParams = ((URI)request.getURI()).getQueryParameters();
+	for(const auto& queryParam : queryParams){
+	//for(auto itr = queryParams.cbegin(); itr != queryParams.cend(); ++itr){
+		reqText += queryParam.first;
+		reqText += ' ';
+		reqText += queryParam.second;
+	}
+	reqText += ':';
+	//added by sam 20170623b
+
+	reqText += ((URI)request.getURI()).toString();	 	//added by sam 20170623 file:///Users/sms/nextsmsversion/macchinadoc/docs/Poco.URI.html#18804
+
 	reqText += ' ';
 	reqText += request.getVersion();
 	
