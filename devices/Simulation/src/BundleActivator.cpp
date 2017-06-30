@@ -101,6 +101,10 @@ public:
 		}
 		
 		ServiceRef::Ptr pServiceRef = _pContext->registry().registerService(params.id, pSensorRemoteObject, props);
+		if(_pContext){
+			//by log params.id -> PA.instantMessage.1
+			_pContext->logger().error(Poco::format("Simulation::BundleActivator void createSensor registry().registerService: %s", params.id));//tmp by sam 20170626
+		}
 		_serviceRefs.push_back(pServiceRef);
 	}
 

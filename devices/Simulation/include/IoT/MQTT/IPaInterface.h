@@ -47,8 +47,6 @@ public:
 	virtual ~IPaInterface();
 		/// Destroys the IPaInterface.
 
-	virtual virtual IoT::Simulation::PaInterface::MQTTClient() = 0;
-
 	bool isA(const std::type_info& otherType) const;
 		/// Returns true if the class is a subclass of the class given by otherType.
 

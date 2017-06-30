@@ -5,11 +5,12 @@
 #
 # Makefile for macchina.io bundle administration utility
 #
-
 BUNDLE_TOOL = $(POCO_BASE)/OSP/BundleCreator/$(POCO_HOST_BINDIR)/bundle
 PAGECOMPILER = $(POCO_BASE)/PageCompiler/$(POCO_HOST_BINDIR)/cpspc
 
 include $(POCO_BASE)/build/rules/global
+
+INCLUDE += -I$(PROJECT_BASE)/devices/Devices/include -I$(PROJECT_BASE)/devices/Simulation/include -I$(PROJECT_BASE)/devices/Simulation/src 
 
 objects =  \
 	BundleRequestHandler \

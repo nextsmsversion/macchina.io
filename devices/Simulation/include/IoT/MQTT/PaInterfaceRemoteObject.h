@@ -47,19 +47,11 @@ public:
 	virtual ~PaInterfaceRemoteObject();
 		/// Destroys the PaInterfaceRemoteObject.
 
-	IoT::Simulation::PaInterface::MQTTClient IoT::Simulation::PaInterface::MQTTClient();
-
 	virtual const Poco::RemotingNG::Identifiable::TypeId& remoting__typeId() const;
 
 private:
 	Poco::SharedPtr<IoT::Simulation::PaInterface> _pServiceObject;
 };
-
-
-inline IoT::Simulation::PaInterface::MQTTClient PaInterfaceRemoteObject::IoT::Simulation::PaInterface::MQTTClient()
-{
-	return _pServiceObject->IoT::Simulation::PaInterface::MQTTClient();
-}
 
 
 inline const Poco::RemotingNG::Identifiable::TypeId& PaInterfaceRemoteObject::remoting__typeId() const

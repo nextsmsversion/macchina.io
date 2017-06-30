@@ -40,7 +40,10 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
     $scope.orderBy = "name";
     
     $scope.sendPaMessage = function(msgId) {
-    	alert(msgId);
+    	//alert(msgId);
+    	//var deviceRefs = serviceRegistry.find('io.macchina.device != ""');
+    	//var deviceRef = deviceRefs[0];
+    	//var device = deviceRef.instance();
     	DeviceService.paMsg('io.macchina.sched', msgId);
         DeviceService.simplepaMsg();
       }
@@ -51,7 +54,7 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
     $http.get('/macchina/devices/devices.jss').success(function(data) {
       $scope.devices = data;
     });
-    /** frequent update of the status
+    /** frequent update of the status TODO devices.jss pass to DeviceImpl.h
     $interval(function() {
     console.log("frequent update of the status");
       $http.get('/macchina/devices/devices.jss').success(function(data) {

@@ -17,7 +17,7 @@ objects = Bundle BundleProperties BundleEvent BundleManifest OSPException \
 	ExtensionPoint ExtensionPointService \
 	BundleFactory BundleContextFactory BundleStreamFactory \
 	Configuration Preferences PreferencesEvent PreferencesService \
-	BundleInstallerService OSPSubsystem AuthService
+	BundleInstallerService PaInterfaceService OSPSubsystem PaService AuthService
 
 target         = PocoOSP
 target_version = 2

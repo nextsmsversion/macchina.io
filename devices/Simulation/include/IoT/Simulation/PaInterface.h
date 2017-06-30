@@ -16,8 +16,8 @@
 //
 
 
-#ifndef IoT_MQTT_PaInterface_INCLUDED
-#define IoT_MQTT_PaInterface_INCLUDED
+#ifndef IoT_SIMULATION_PaInterface_INCLUDED
+#define IoT_SIMULATION_PaInterface_INCLUDED
 
 
 #include "Poco/BasicEvent.h"
@@ -58,7 +58,7 @@ namespace IoT {
 		/// attempt to reconnect if the connection to the server is lost.
 		{
 			public:
-				MQTTClient();
+				PaInterface();
 
 		};
 

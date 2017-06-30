@@ -33,6 +33,7 @@ const std::string BundleInstallerService::SERVICE_NAME("osp.core.installer");
 BundleInstallerService::BundleInstallerService(BundleRepository& repository):
 	_bundleRepository(repository)
 {
+
 }
 
 

@@ -22,6 +22,7 @@ for (var i = 0; i < deviceRefs.length; i++)
 		
 		deviceInfo.PaMessage = "1"; //while no device.hdop();	//by sam 200170619 
 		/**"PaMessage" **/
+		device.sentPaMessage("PA");
 		if (device.hasProperty("PaMessage"))
 		{
 			deviceInfo.PaMessage = device.getPropertyString("PaMessage");
