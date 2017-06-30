@@ -47,11 +47,11 @@
             <thead>
               <tr>
                 <!-- 20170529 by sam  <th ng-click="setOrderBy('name')" class="list-sortable">Name</th>  -->
-                <th ng-click="setOrderBy('symbolicName')" class="list-sortable">Symbolic Name</th>
+                <th ng-click="setOrderBy('symbolicName')" class="list-sortable">Message Type</th>
                 <th ng-click="setOrderBy('id')" class="list-sortable">ID</th>
-                <th ng-click="setOrderBy('physicalQuantity')" class="list-sortable">Physical Quantity</th>
+                <th ng-click="setOrderBy('physicalQuantity')" class="list-sortable">Message Name</th>
                 <!-- 20170529 by sam  <th>State/Value</th> -->
-                <th>TODO sentPaMessage()</th>
+                <!-- 20170529 by sam  <th>TODO sentPaMessage()</th> -->
               </tr>
             </thead>
         	<input ng-model="states.activeItem" type = "text" id="msgIDTxt" visibility="hidden"/> 
@@ -63,12 +63,13 @@
                 <td>{{device.id}}</td>
                 <td>{{device.physicalQuantity}}</td>
                 <!-- 20170529 by sam  <td>{{device.displayValue}}</td> -->
-                <td>{{device.PaMessage}}</td>
+                <!-- 20170529 by sam  <td>{{device.PaMessage}}</td>	 -->
               </tr>
             </tbody>
           </table>
           <!-- 20170607 by sam  TODO trigger an action in C++ by addMethodHandler -->
           <button ng-click="sendPaMessage(states.activeItem)">Record</button>
+          <button ng-click="sendPaMessage(states.activeItem)">Night</button>
         </div>
       </div>
     </div>

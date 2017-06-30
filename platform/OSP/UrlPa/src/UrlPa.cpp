@@ -92,6 +92,15 @@ public:
 		std::string name(typeid(UrlPaService).name());
 		return name == otherType.name() || Poco::OSP::Auth::PaService::isA(otherType);
 	}
+
+	std::string sendPaCommand(int nightMode) const
+	{
+		if(nightMode == 1){
+			return "Inside UrlPa: sendPaCommand OFF";
+		}else{
+			return "Inside UrlPa: sendPaCommand ON";
+		}
+	}
 	
 protected:
 	std::string hashCredentials(const std::string& credentials) const
@@ -152,6 +161,7 @@ public:
 		pContext->registry().unregisterService(_pService);
 	}
 	
+
 private:
 	ServiceRef::Ptr _pService;
 };

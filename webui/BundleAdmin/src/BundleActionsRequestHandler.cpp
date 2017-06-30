@@ -29,7 +29,6 @@
 #include "IoT/MQTT/IPaInterface.h"	//how the to link to IoT
 #include "IoT/Devices/IDevice.h"
 #include "IoT/Devices/Device.h"
-#include "SimulatedSensor.h"
 #include "Poco/OSP/PaInterfaceService.h"
 
 namespace IoT {
@@ -89,7 +88,7 @@ void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& re
 {
 	if (context()->logger().information())	//by sam 20170623 request from extensions.xml -> BundleActionsRequestHandlerFactory
 	{
-			context()->logger().information("INSIDE (by sam) BundleActionsRequestHandler::handleRequest"); //by sam
+			context()->logger().information("Entering BundleActionsRequestHandler::handleRequest"); //by sam
 	}
 	Poco::OSP::Web::WebSession::Ptr pSession;
 	{
@@ -102,23 +101,6 @@ void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& re
 	}
 	if (!Utility::isAuthenticated(pSession, response)) return;
 
-	if (context()->logger().information())	//by sam 20170623 request from extensions.xml -> BundleActionsRequestHandlerFactory
-	{
-			context()->logger().information("INSIDE (by sam) BundleActionsRequestHandler::handleRequest isAuthenticated"); //by sam
-			Poco::OSP::ServiceRef::Ptr pSimulatedDeviceRef = context()->registry().findByName("PA.instantMessage.1");
-			if(pSimulatedDeviceRef){
-
-				context()->logger().information("INSIDE (by sam) pSimulatedDeviceRef is found "); //by sam
-				//TODO by sam take reference to SimpleAuth.cpp instead of
-				Poco::OSP::Auth::PaService::Ptr pPaService = Poco::OSP::ServiceFinder::findByName<Poco::OSP::Auth::PaService>(context(), "osp.urlpa");
-				//Poco::OSP::PaInterfaceService::Ptr pPaInterfaceService = Poco::OSP::ServiceFinder::find<Poco::OSP::PaInterfaceService>(context());
-				//pPaInterfaceService->sendPassage();
-
-			}else{
-				context()->logger().information("INSIDE (by sam) pSimulatedDeviceRef is NULL?? "); //by sam
-			}
-
-	}
 	std::string username = pSession->getValue<std::string>("username");
 	Poco::OSP::Auth::AuthService::Ptr pAuthService = Poco::OSP::ServiceFinder::findByName<Poco::OSP::Auth::AuthService>(context(), "osp.auth");
 
@@ -130,11 +112,6 @@ void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& re
 		return;
 	}
 	
-	if (context()->logger().information())	//by sam 20170623 request from extensions.xml -> BundleActionsRequestHandlerFactory
-	{
-			context()->logger().information("INSIDE (by sam) BundleActionsRequestHandler::handleRequest bundleAdmin OK"); //by sam
-	}
-
 	std::string symbolicName;
 	std::string bundleState;
 	std::string error;
@@ -153,10 +130,12 @@ void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& re
 	std::string testAction = form.get("action", "xxx");//by sam 20170623
 	std::string testBundle = form.get("bundle", "xxx");//by sam 20170623
 	std::string testInput = form.get("input", "xxx");//by sam 20170623
-		if (context()->logger().information())	//by sam 20170623 request from extensions.xml -> BundleActionsRequestHandlerFactory
-		{
-			context()->logger().information(Poco::format("BundleActionsRequestHandler.cpp Performing action %s on bundle %s MsgType: %s.", testAction, testBundle, testInput)); //by sam
-		}
+	if (context()->logger().information() && testAction.compare("paMsg") == 0){
+			context()->logger().information(Poco::format("BundleActionsRequestHandler.cpp Receiving action %s on bundle %s MsgType: %s.", testAction, testBundle, testInput)); //by sam
+			Poco::OSP::Auth::PaService::Ptr pPaService = Poco::OSP::ServiceFinder::findByName<Poco::OSP::Auth::PaService>(context(), "osp.urlpa");
+			context()->logger().information("Calling <pPaService->sendPaCommand()>");
+			context()->logger().information(pPaService->sendPaCommand(0));
+	}
 	Poco::OSP::Bundle::Ptr pBundle = installHandler.bundle();
 	if (pBundle)
 	{

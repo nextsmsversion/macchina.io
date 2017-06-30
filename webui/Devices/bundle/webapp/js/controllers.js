@@ -17,8 +17,8 @@ devicesControllers.service('DeviceService', ['$http',
 		        data: inputdata
     	};
     	$http(request)
-    		.success(function() {})
-    		.error(function() {});
+    		.success(	function() {	alert("Pa Message Sent successfully");})
+    		.error(		function() {	alert("Oops.. something wrong");});
     };
 
     this.paMsg = function(symbolicName, inputId) {
@@ -40,12 +40,8 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
     $scope.orderBy = "name";
     
     $scope.sendPaMessage = function(msgId) {
-    	//alert(msgId);
-    	//var deviceRefs = serviceRegistry.find('io.macchina.device != ""');
-    	//var deviceRef = deviceRefs[0];
-    	//var device = deviceRef.instance();
     	DeviceService.paMsg('io.macchina.sched', msgId);
-        DeviceService.simplepaMsg();
+        //tmp debugging in case there is no DeviceService.simplepaMsg();
       }
     
     $scope.setOrderBy = function(col) {

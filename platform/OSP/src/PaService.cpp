@@ -38,6 +38,7 @@ const std::type_info& PaService::type() const
 	return typeid(PaService);
 }
 
+
 	
 bool PaService::isA(const std::type_info& otherType) const
 {
@@ -45,5 +46,9 @@ bool PaService::isA(const std::type_info& otherType) const
 	return name == otherType.name() || Service::isA(otherType);
 }
 
-
+/**
+std::string PaService::sendPaCommand(int nightMode) const{
+	return "Inside PaService::sendPaCommand OFF";
+}
+**/
 } } } // namespace Poco::OSP::Auth
