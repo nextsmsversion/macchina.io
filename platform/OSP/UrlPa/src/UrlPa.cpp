@@ -23,6 +23,16 @@
 #include <set>
 
 
+//added by sam 20170703 for adding socket to connect to PA server START
+#include <Poco/Net/FTPClientSession.h>	//inet_addr
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <strings.h>
+#include <stdio.h>
+//added by sam 20170703 for adding socket to connect to PA server FINISH
+
+
 using Poco::OSP::BundleActivator;
 using Poco::OSP::BundleContext;
 using Poco::OSP::Bundle;
@@ -93,8 +103,11 @@ public:
 		return name == otherType.name() || Poco::OSP::Auth::PaService::isA(otherType);
 	}
 
+	//TODO by sam keyword: sockfd; reference from devices/Simulation/src/BundleActivator & SimulatedSensor
 	std::string sendPaCommand(int nightMode) const
 	{
+		int _sockfrd = connectSocket();
+		sendPaMsg(_sockfrd);
 		if(nightMode == 1){
 			return "Inside UrlPa: sendPaCommand OFF";
 		}else{
@@ -102,6 +115,46 @@ public:
 		}
 	}
 	
+
+
+	//added by sam 20170703 for adding socket to connect to PA server START
+	int connectSocket() const{
+		struct sockaddr_in dest;
+		char buffer[128];
+
+		/**create socket*/
+		int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+		/**initinalize value in dest**/
+		bzero(&dest, sizeof(dest));
+		dest.sin_family = AF_INET;
+		dest.sin_port = htons(1100);
+		dest.sin_addr.s_addr = inet_addr("128.12.46.246");//TODO by sam to get from parameter file
+
+		/**connecting to server**/
+		connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
+
+		return sockfd;
+	}
+
+	void sendPaMsg(int _sockfd) const{
+		//cerr << "LOG: Inside SimulatedSensor:sendPaMsg BEGIN "  << endl;
+		int flag =1;
+		setsockopt(_sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
+
+		//char paMsg[16]="0003C22FN100@71";
+		//trial of message replay :
+		//1) SMS connect to PA
+		//2) Press Night On
+		//3) start this server and this message sent to PA to trigger Night Off
+		char paMsg[16]="0003C22FN100@71";
+		paMsg[15] = '\n';
+
+		send(_sockfd, paMsg, sizeof(paMsg), 0);
+		close(_sockfd);
+	}
+	//added by sam 20170703 for adding socket to connect to PA server FINISH
+
 protected:
 	std::string hashCredentials(const std::string& credentials) const
 	{

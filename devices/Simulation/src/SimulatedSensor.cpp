@@ -114,7 +114,7 @@ public:
 		char paMsg[16]="0003C22FN100@71";
 		paMsg[15] = '\n';
 
-		send(_sockfd, paMsg, sizeof(paMsg), 0);
+		//tmp by sam 20170703 send(_sockfd, paMsg, sizeof(paMsg), 0);
 		//cerr << "LOG: Inside SimulatedSensor sendPaMsg send(sockfd"  << endl;
 		//close(_sockfd);
 	}
