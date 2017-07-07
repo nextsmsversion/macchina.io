@@ -47,10 +47,10 @@
             <thead>
               <tr>
                 <!-- 20170529 by sam  <th ng-click="setOrderBy('name')" class="list-sortable">Name</th>  -->
-                <th ng-click="setOrderBy('symbolicName')" class="list-sortable">Message Type</th>
+                <!-- 20170529 by sam  <th ng-click="setOrderBy('symbolicName')" class="list-sortable">Message Type</th> -->
                 <th ng-click="setOrderBy('id')" class="list-sortable">ID</th>
                 <th ng-click="setOrderBy('physicalQuantity')" class="list-sortable">Message Name</th>
-                <!-- 20170529 by sam  <th>State/Value</th> -->
+                <!-- 20170529 by sam  <th>State/Value</th>	-->
                 <!-- 20170529 by sam  <th>TODO sentPaMessage()</th> -->
               </tr>
             </thead>
@@ -59,8 +59,8 @@
               <tr ng-repeat="device in devices | orderBy:orderBy track by $index"  class="device" 
 	        	ng-class="{'active': device.id == states.activeItem}" ng-click="states.activeItem=device.id" ng-class-even="'even'" ng-class-odd="'odd'">
                 <!-- 20170529 by sam <td>{{device.name}}</td> -->
-                <td>{{device.symbolicName}}</td>
-                <td>{{device.id}}</td>
+                <!-- 20170529 by sam   <td>{{device.symbolicName}}</td> -->
+                <td>{{device.id | number }}</td>
                 <td>{{device.physicalQuantity}}</td>
                 <!-- 20170529 by sam  <td>{{device.displayValue}}</td> -->
                 <!-- 20170529 by sam  <td>{{device.PaMessage}}</td>	 -->

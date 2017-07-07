@@ -23,6 +23,17 @@
 #include <set>
 
 
+//added by sam 20170522 for trying FTP START
+#include <Poco/Exception.h>
+#include <Poco/StreamCopier.h>
+#include <Poco/Net/NetException.h>
+//added by sam 20170522 for trying FTP FINISH
+
+//added by sam 20170523 filestream START
+#include "Poco/FileStream.h"
+#include <sstream>
+//added by sam 20170523 for tokenizing FINISH
+
 //added by sam 20170703 for adding socket to connect to PA server START
 #include <Poco/Net/FTPClientSession.h>	//inet_addr
 #include <sys/types.h>
@@ -32,6 +43,15 @@
 #include <stdio.h>
 //added by sam 20170703 for adding socket to connect to PA server FINISH
 
+//added by sam 20170518 for trying START
+#include <Poco/Path.h>
+#include <iostream>
+#include <fstream>
+
+using namespace Poco::Net;
+using namespace Poco;
+using namespace std;
+//added by sam 20170518 for trying FINISH
 
 using Poco::OSP::BundleActivator;
 using Poco::OSP::BundleContext;
@@ -138,7 +158,7 @@ public:
 	}
 
 	void sendPaMsg(int _sockfd) const{
-		//cerr << "LOG: Inside SimulatedSensor:sendPaMsg BEGIN "  << endl;
+		cerr << "LOG: Inside UrlPa:sendPaMsg BEGIN "  << endl;
 		int flag =1;
 		setsockopt(_sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
 
@@ -152,8 +172,10 @@ public:
 
 		send(_sockfd, paMsg, sizeof(paMsg), 0);
 		close(_sockfd);
+
 	}
 	//added by sam 20170703 for adding socket to connect to PA server FINISH
+
 
 protected:
 	std::string hashCredentials(const std::string& credentials) const

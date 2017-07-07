@@ -16,7 +16,7 @@ for (var i = 0; i < deviceRefs.length; i++)
 	if (device)
 	{ 
 		var deviceInfo = {};
-		deviceInfo.id = deviceRef.name;
+		deviceInfo.id = parseInt(deviceRef.name);
 		deviceInfo.name = device.getPropertyString("name");
 		deviceInfo.symbolicName = device.getPropertyString("symbolicName");
 		

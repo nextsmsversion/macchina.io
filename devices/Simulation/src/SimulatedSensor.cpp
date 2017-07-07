@@ -15,6 +15,9 @@
 #include "Poco/Util/TimerTask.h"
 #include "Poco/Random.h"
 
+
+#include "Poco/OSP/Pa/PaService.h"	//by sam 20170705
+
 //added by sam 20170523 filestream START
 #include "Poco/FileStream.h"
 //added by sam 20170523 filestream FINISH
@@ -76,62 +79,14 @@ public:
 	{
 
 	}
-/** by sam 20170606
-	//added by sam 20170601 for adding socket to connect to PA server START
-	//reference : InitClient EtherUtils.cpp
-	void connectSocket(){
-		cerr << "LOG: Inside SimulatedSensor:connectSocket BEGIN "  << endl;
-
-		///create socket
-		sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
-		//initinalize value in dest
-		bzero(&dest, sizeof(dest));
-		dest.sin_family = AF_INET;
-		dest.sin_port = htons(1100);
-		dest.sin_addr.s_addr = inet_addr("128.12.46.246");
-
-		//connecting to server
-		connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
-
-
-		//close(sockfd);
-	}
-**/
-	void sendPaMsg(){
-		//cerr << "LOG: Inside SimulatedSensor:sendPaMsg BEGIN "  << endl;
-		//added by sam 20170606 BEGIN
-		int flag =1;
-		setsockopt(_sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
-		//added by sam 20170606 FINISH
-
-		//char paMsg[16]="0003C22FN100@71";
-		//trial of message replay :
-		//1) SMS connect to PA
-		//2) Press Night On
-		//3) start this server and this message sent to PA to trigger Night Off
-		//char paMsg[16]="0003C22FN100@71";
-		char paMsg[16]="0003C22FN100@71";
-		paMsg[15] = '\n';
-
-		//tmp by sam 20170703 send(_sockfd, paMsg, sizeof(paMsg), 0);
-		//cerr << "LOG: Inside SimulatedSensor sendPaMsg send(sockfd"  << endl;
-		//close(_sockfd);
-	}
-	//added by sam 20170601 for adding socket to connect to PA server FINISH
 
 
 	void run()
 	{
-		sendPaMsg();
 
-		/** tmp by sam
-		string localfilename = "/Users/sms/a.txt", remotefilename = "instant.txt";
-		getFile(localfilename, remotefilename,
-				"ftpuser", "ftp123456", "128.12.46.246");
-				**/
+		string localfilename = "/Users/sms/a.txt", remotefilename = "PAServer/config/instant.txt";
+		getFile(localfilename, remotefilename, "anonymous", "sms", "128.12.46.246");
 		loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
-
 
 		if (++_count == _cycles)
 		{
@@ -146,6 +101,11 @@ public:
 			value += _delta;
 			_sensor.update(value);
 
+			//by sam 20170706
+			string sensorStr = Poco::AnyCast<string>(_sensor._deviceIdentifier);
+			int thisSensorId = 	stoi(sensorStr);
+			_sensor.setPhysicalQuantity(instantMsgMap[thisSensorId]); //TODO how come this cannot update
+
 			_sensor.setSymbolicName("INSTANT"); //added by sam 20170523 TODO
 		}
 	}
@@ -156,11 +116,13 @@ public:
 		string line;
 		std::ifstream myfile(localfilename);
 		if(myfile.is_open()){
+			instantMsgMap.clear();
 			while(getline(myfile,line)){	//for each line of the file
 				//added by sam 20170523 SmsFilePaMgr::ReadInstantMsgConfig for tokenizing the instant file START
 				//Suppose string line = "Instant 01E	Test Message";
 
 				/**decoding of the following example message line:
+				 * msgID:		msgText:
 				 * Instant 01E	Test Message
 				 */
 				stringstream ss(line);
@@ -171,11 +133,9 @@ public:
 					switch (instantMsgColumn){
 						case 1:		//first column
 							msgID = std::stoi(tmpStr.substr(8,2));
-							//cerr << "msgID:<"<< msgID << ">" << endl;
 							break;
 						case 2:		//second column
 							msgText = tmpStr;
-							//cerr << "msgText:["<< msgText << "]" ; cerr << endl;
 							break;
 					}
 					instantMsgColumn ++;
@@ -188,10 +148,6 @@ public:
 			myfile.close();
 		}
 
-		//cerr << "PA Instant Message: " << endl;
-		//cerr << "instantMsgMap[1]:" << instantMsgMap[1] << endl;
-		//cerr << "instantMsgMap[3]:" << instantMsgMap[3] << endl;
-		//cerr << "instantMsgMap[6]:" << instantMsgMap[6] << endl;
 
 		//added by sam 20170523 filestream FINISH
 	}
@@ -504,6 +460,7 @@ Poco::Any SimulatedSensor::getSymbolicName(const std::string&) const
 {
 	return _symbolicName;
 }
+
 void SimulatedSensor::setSymbolicName(std::string value)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
@@ -511,6 +468,16 @@ void SimulatedSensor::setSymbolicName(std::string value)
 	//if (_symbolicName != value)
 	{
 		_symbolicName = value;
+		//_pEventPolicy->valueChanged(value);
+	}
+}
+void SimulatedSensor::setPhysicalQuantity(std::string value)
+{
+	Poco::Mutex::ScopedLock lock(_mutex);
+
+	//if (_symbolicName != value)
+	{
+		_physicalQuantity = value;
 		//_pEventPolicy->valueChanged(value);
 	}
 }

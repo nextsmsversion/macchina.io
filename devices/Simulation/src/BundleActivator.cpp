@@ -164,18 +164,17 @@ public:
 
 		//TODO get the file from FTP
 		//added by sam 20170525 to get the PA mesages through FTP START
-		string localfilename = "/Users/sms/a.txt", remotefilename = "instant.txt";
-		getFile(localfilename, remotefilename, "ftpuser", "ftp123456", "128.12.46.246"); //TODO *** solve the problem if the FTP is not ON
+		string localfilename = "/Users/sms/a.txt", remotefilename = "PAServer/config/instant.txt";
+		getFile(localfilename, remotefilename, "anonymous", "sms", "128.12.46.246"); //TODO *** solve the problem if the FTP is not ON
 		loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
 		//added by sam 20170525 to get the PA mesages through FTP FINISH
 
 		///added by sam 20170524 for setting timer to update the PA from FTP START
-		for(int i=1; i<8 ;i++ )	//added by sam 20170529
+		for(int i=1; i< 9 ;i++ )	//added by sam 20170529
 		{
 			std::string baseKey = "PA.instantMessage.";
 			SimulatedSensor::Params params;
-			params.id = "PA.instantMessage.";
-			params.id += std::to_string(i);	//"#PA";
+			params.id = std::to_string(i);	//this must be only number otherwise, cannot perform: Poco::AnyCast<string>(_sensor._deviceIdentifier);
 
 			params.physicalQuantity = instantMsgMap[i]; //"db";// _pPrefs->configuration()->getString(baseKey + ".physicalQuantity", "");
 			params.physicalUnit     = "db";// _pPrefs->configuration()->getString(baseKey + ".physicalUnit", "");
@@ -195,64 +194,7 @@ public:
 			}
 		}
 		//added by sam 20170524 for setting timer to update the PA from FTP FINISH
-/**
-		Poco::Util::AbstractConfiguration::Keys keys;
-		_pPrefs->configuration()->keys("simulation.sensors", keys);
-		int index = 0;
-		for (std::vector<std::string>::const_iterator it = keys.begin(); it != keys.end(); ++it)
-		{
-			std::string baseKey = "simulation.sensors.";
-			baseKey += *it;
 
-			SimulatedSensor::Params params;
-			params.id = SimulatedSensor::SYMBOLIC_NAME;
-			params.id += "#";
-			params.id += Poco::NumberFormatter::format(_serviceRefs.size());
-
-			params.physicalQuantity = _pPrefs->configuration()->getString(baseKey + ".physicalQuantity", "");
-			params.physicalUnit     = _pPrefs->configuration()->getString(baseKey + ".physicalUnit", "");
-			params.initialValue     = _pPrefs->configuration()->getDouble(baseKey + ".initialValue", 0.0);
-			params.delta            = _pPrefs->configuration()->getDouble(baseKey + ".delta", 0.0);
-			params.cycles           = _pPrefs->configuration()->getInt(baseKey + ".cycles", 0);
-			params.updateRate       = _pPrefs->configuration()->getDouble(baseKey + ".updateRate", 0.0);
-
-			std::string mode = _pPrefs->configuration()->getString(baseKey + ".mode", "linear");
-			if (mode == "linear")
-				params.mode = SimulatedSensor::SIM_LINEAR;
-			else if (mode == "random")
-				params.mode = SimulatedSensor::SIM_RANDOM;
-
-			try
-			{
-				createSensor(params);
-			}
-			catch (Poco::Exception& exc)
-			{
-				pContext->logger().error(Poco::format("Cannot create simulated sensor: %s", exc.displayText()));
-			}
-			index++;
-		}
-
-		std::string gpxPath = _pPrefs->configuration()->getString("simulation.gnss.gpxPath", "");
-		if (!gpxPath.empty())
-		{
-			SimulatedGNSSSensor::Params params;
-			params.id = SimulatedGNSSSensor::SYMBOLIC_NAME;
-			params.gpxPath = gpxPath;
-			params.loopReplay = _pPrefs->configuration()->getBool("simulation.gnss.loopReplay", true);
-			params.speedUp = _pPrefs->configuration()->getDouble("simulation.gnss.speedUp", 1.0);
-
-			try
-			{
-				createGNSSSensor(params);
-			}
-			catch (Poco::Exception& exc)
-			{
-				pContext->logger().error(Poco::format("Cannot create simulated GNSS sensor: %s", exc.displayText()));
-			}
-		}
-
-		**/
 	}
 	void loadFile(	string localfilename){
 		cerr << "LOG: Inside LinearUpdateTimerTask loadFile"  << endl;
@@ -314,11 +256,6 @@ public:
 						string USERNAME, string PASSWORD, string HOST){
 			cerr << "LOG: Inside LinearUpdateTimerTask getFile"  << endl;
 			try {
-				/**
-				if(1){				//TODO by check the FTP server is down
-					return;
-				}
-				**/
 			//added by sam 20170518 for establishing FTP session START
 			FTPClientSession session(HOST, FTPClientSession::FTP_PORT, USERNAME, PASSWORD); cerr << "LOG: 246"  << endl;
 			Path localFilePath(localfilename);												cerr << "LOG: 247"  << endl;
@@ -330,6 +267,8 @@ public:
 					session.setFileType(FTPClientSession::TYPE_BINARY);						cerr << "LOG: 253"  << endl;
 					auto& is = session.beginDownload(remotefilename);						cerr << "LOG: 254"  << endl;
 					StreamCopier::copyStream(is, file);										cerr << "LOG: 255"  << endl;
+					//tmp by sam
+					loadFile("/Users/sms/a.txt");	cerr << "LOG: 334 loadfile"  << endl;
 					//session.endDownload();								//TODO throw exception??
 			}
 			catch (FTPException& e) {

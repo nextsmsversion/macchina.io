@@ -34,14 +34,20 @@ devicesControllers.service('DeviceService', ['$http',
 devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','DeviceService',
   function ($scope, $http, $interval, DeviceService) {
 	$scope.states = {};	//
-	$scope.states.activeItem = 'PA.instantMessage.1'; //
+	$scope.states.activeItem = '1'; //
 	
     $scope.devices = [];
     $scope.orderBy = "name";
     
     $scope.sendPaMessage = function(msgId) {
+    	//by sam 20170705
+        $http.get('/macchina/devices/devices.jss').success(function(data) {
+            $scope.devices = data;
+          });
+        
     	DeviceService.paMsg('io.macchina.sched', msgId);
         //tmp debugging in case there is no DeviceService.simplepaMsg();
+    	
       }
     
     $scope.setOrderBy = function(col) {
@@ -50,14 +56,13 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
     $http.get('/macchina/devices/devices.jss').success(function(data) {
       $scope.devices = data;
     });
-    /** frequent update of the status TODO devices.jss pass to DeviceImpl.h
+    
     $interval(function() {
     console.log("frequent update of the status");
       $http.get('/macchina/devices/devices.jss').success(function(data) {
         $scope.devices = data;
       })
     }, 1000);
-    **/
   }]);
 
 devicesControllers.controller('SessionCtrl', ['$scope', '$http',
