@@ -3,6 +3,7 @@
 as long as the bullet point is removed, this can be put back 
 
 -->
+<script type="text/javascript" src="/jquery/jquery.min.js"></script>
 <style>
     body, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115, .pg-file-cs-21, .pg-file-cs-21, .pg-file-cs-21, .pg-file-cs-21, .pg-file-cs-21, .pg-file-cs-33, .pg-file-cs-37 {
     padding: 20px; 
@@ -73,8 +74,6 @@ as long as the bullet point is removed, this can be put back
     }
 
 </style>
-
-<script type="text/javascript" src="/jquery/jquery.min.js"></script>
 <script type="text/javascript">
 
 	$(document).ready(function() {
@@ -202,7 +201,7 @@ as long as the bullet point is removed, this can be put back
                                     <!-- 20170712 -->
                                     <!-- 20170529 by sam FINISH originally  <div ng-controller="DevicesCtrl" class="groupbox"> -->
                                     <button ng-click="sendPaMessage(states.activeItem)" type="button" style="color: #f4eeee;background-color: #b7abab;width: 80px;height: 40px;font-size: 12px;" class="bg-info">Night</button>
-                                    <button ng-click="sendPaMessage(states.activeItem)" type="button" class="bg-success" style="color: #f4eeee;background-color: #b7abab;width: 80px;height: 40px;font-size: 12px;">Add Sche.</button>
+                                    <button ng-click="sendPaMessage(states.activeItem)" type="button" class="bg-success" style="color: #f4eeee;background-color: #b7abab;width: 80px;height: 40px;font-size: 12px;">Add Schedule</button>
                                     <input ng-model="states.activeItem" type="text" id="msgIDTxt" visibility="false" class="invisible" />
                                 </li>                                 
                                 <!-- 20170712 -->
@@ -242,7 +241,7 @@ as long as the bullet point is removed, this can be put back
                             <!-- 20170529 by sam FINISH originally  <div ng-controller="DevicesCtrl" class="groupbox"> -->
                             <button ng-click="sendPaMessage(states.activeItem)">SAVE</button>
                             <button ng-click="sendPaMessage(states.activeItem)">DELETE</button>
-                            <input ng-model="states.activeItem" type="text" id="msgIDTxt" visibility="false" style="display: none"  />
+                            <input ng-model="states.activeItem" type="text" id="msgIDTxt" visibility="false" class="hidden" />
                         </div>
                         <div id="tab-3" class="tab-content">
                             <p>Schedule EDIT</p>

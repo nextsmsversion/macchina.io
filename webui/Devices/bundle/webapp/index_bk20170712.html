@@ -5,19 +5,19 @@ as long as the bullet point is removed, this can be put back
 -->
 <script type="text/javascript" src="/jquery/jquery.min.js"></script>
 <style>
-    body, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103 {
+    body, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115 {
     padding: 20px; 
     font-family: Arial, Helvetica, sans-serif;
     line-height: 1.5;
     font-size: 14px;        
     }
-    .tabs-menu, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103 {
+    .tabs-menu, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115 {
     height: 30px;
     float: left;
     clear: both;
     list-style-type:none;
     }
-    .tabs-menu li, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103 {
+    .tabs-menu li, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115 {
     height: 30px;
     line-height: 30px;
     float: left;
@@ -27,37 +27,37 @@ as long as the bullet point is removed, this can be put back
     border-right: 1px solid #d4d4d1;
     border-left: 1px solid #d4d4d1;
     }
-    .tabs-menu li.current, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103 {
+    .tabs-menu li.current, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115 {
     position: relative;
     background-color: #fff;
     border-bottom: 1px solid #fff;
     z-index: 5;
     }
-    .tabs-menu li a, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103 {
+    .tabs-menu li a, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115 {
     padding: 10px;
     text-transform: uppercase;
     color: #fff;
     text-decoration: none; 
     }
-    .tabs-menu .current a, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103 {
+    .tabs-menu .current a, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115 {
     color: #2e7da3;
     }
-    .tab, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103 {
+    .tab, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115 {
     border: 1px solid #d4d4d1;
     background-color: #fff;
     float: left;
     margin-bottom: 20px;
     width: auto;
     }
-    .tab-content, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103 {
+    .tab-content, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115 {
     width: 660px;
     padding: 20px;
     display: none;
     }
-    #tab-1, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103 {
+    #tab-1, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115 {
     display: block;   
     }
-    .button, .pg-file-cs-82, .pg-file-cs-103 {
+    .button, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115 {
     background-color : #4CAF50;
     border : none;
     color : white;
@@ -91,10 +91,12 @@ as long as the bullet point is removed, this can be put back
         <title>SMS PA</title>
         <link rel="stylesheet" href="/css/macchina.css" type="text/css" />
         <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css" />
+        <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css" />
         <link rel="icon" href="/images/favicon.ico">
         <script type="text/javascript" src="/angular/angular.min.js"></script>
         <script type="text/javascript" src="/macchina/devices/js/app.js"></script>
         <script type="text/javascript" src="/macchina/devices/js/controllers.js"></script>
+        <script type="text/javascript" src="/macchina/devices/js/bootstrap.min.js"></script>
     </head>
     <body ng-controller="SessionCtrl">
         <header>
@@ -129,12 +131,36 @@ as long as the bullet point is removed, this can be put back
                 <div id="tabs-container" ng-controller="DevicesCtrl"> 
                     <div class="tab" style="background: transparent;border: 1px solid rgba(0, 0, 0, 0);border-radius: 0px;height: 100">
                         <button type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 20px;padding-left: 20;position: relative;margin-left: 20px">All Ent</button>
+                        <button type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 20px;padding-left: 20;position: relative;margin-left: 20px">Ent A</button>
+                        <button type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 20px;padding-left: 20;position: relative;margin-left: 20px">Ent B</button>
+                        <button type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 20px;padding-left: 20;position: relative;margin-left: 20px">Ent C</button>
                         <div>
                             <h1><h2><p><h2><div class="form-group"> 
 </div></h2></p></h2></h1>
                         </div>
+                        <div>
+                            <button type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 16px;padding-left: 20;position: relative;margin-left: 20px"> All Conc</button>
+                            <button type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 12px;padding-left: 20;position: relative;margin-left: 20px">Conc UE</button>
+                            <button type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 12px;padding-left: 20;position: relative;margin-left: 20px">Conc DE</button>
+                        </div>
+                        <div>
+                            <div class="form-group"> 
+</div>
+                        </div>
+                        <div class="container">
+                            <div class="row">
+                                <div class="row">
+                                    <div class="col-md-4"> 
+</div>
+                                </div>
+                            </div>
+                        </div>
                         <div id="tab-1" class="tab-content" style="--empty-placeholder: 0px">
                             <!-- 20170529 by sam START originally  <div ng-controller="DevicesCtrl" class="groupbox"> -->
+                            <div>
+                                <label class="control-label">Comment: </label>
+                                <input type="text" class="form-control" placeholder="Placeholder text" style="margin-left: 20px">
+                            </div>
                             <div class="groupbox">
                                 <table class="list" style="width: 100%">
                                     <thead>
@@ -168,14 +194,18 @@ as long as the bullet point is removed, this can be put back
                         </div>
                         <div id="tab-2" class="tab-content">
                             <!-- 20170529 by sam START originally  <div ng-controller="DevicesCtrl" class="groupbox"> -->
+                            <div>
+                                <label class="control-label">Time: </label>
+                                <input type="text" class="form-control" placeholder="Placeholder text" style="margin-left: 20px">
+                            </div>
                             <div class="groupbox">
                                 <table class="list" style="width: 100%">
                                     <thead>
                                         <tr>
                                             <!-- 20170529 by sam  <th ng-click="setOrderBy('name')" class="list-sortable">Name</th>  -->
                                             <!-- 20170529 by sam  <th ng-click="setOrderBy('symbolicName')" class="list-sortable">Message Type</th> -->
-                                            <th ng-click="setOrderBy('id')" class="list-sortable">ID</th>
-                                            <th ng-click="setOrderBy('physicalQuantity')" class="list-sortable">Message Name</th>
+                                            <th ng-click="setOrderBy('id')" class="list-sortable">TIME</th>
+                                            <th ng-click="setOrderBy('physicalQuantity')" class="list-sortable">Message ID</th>
                                             <!-- 20170529 by sam  <th>State/Value</th>	-->
                                             <!-- 20170529 by sam  <th>TODO sentPaMessage()</th> -->
                                         </tr>
