@@ -57,6 +57,26 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
       $scope.devices = data;
     });
     
+    $scope.setZoneCode = function(zoneId) {
+      document.getElementById('txtZoneCode').value = zoneId;//for all zone '#099';
+      document.getElementById('txtTab2ZoneCode').value = zoneId;
+    }
+    
+    //msgIDTxt
+    $scope.setMsgIDTxt = function(indexMsgIDTxt) {
+    	
+        document.getElementById('msgIDTxt').value = indexMsgIDTxt;//for all zone '#099';
+        var instantMsgCodeHeader = "#10.0";
+        instantMsgCodeHeader =instantMsgCodeHeader + indexMsgIDTxt;
+        document.getElementById('txtTab1MsgCode').value = instantMsgCodeHeader;
+        document.getElementById('txtTab2MsgCode').value = instantMsgCodeHeader;
+      }
+    
+    $scope.schedDayFieldInput = function(schedDay) {
+    	
+        document.getElementById('schedDayField').value = schedDay;
+      }
+    
     $interval(function() {
     console.log("frequent update of the status");
       $http.get('/macchina/devices/devices.jss').success(function(data) {

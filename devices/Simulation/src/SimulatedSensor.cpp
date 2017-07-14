@@ -85,7 +85,7 @@ public:
 	{
 
 		string localfilename = "/Users/sms/a.txt", remotefilename = "PAServer/config/instant.txt";
-		getFile(localfilename, remotefilename, "anonymous", "sms", "128.12.46.246");
+		getFile(localfilename, remotefilename, "anonymous", "sms", "128.12.46.246"); //tmp by sam 201707130845
 		loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
 
 		if (++_count == _cycles)

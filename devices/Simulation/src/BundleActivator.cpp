@@ -138,7 +138,7 @@ public:
 		dest.sin_addr.s_addr = inet_addr("128.12.46.246");
 
 		/**connecting to server**/
-		connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
+		connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));//tmp by sam 201707130845
 		/** Receive messge from the server and print to screen */
 		//bzero(buffer, 128);
 		//recv(sockfd, buffer, sizeof(buffer), 0);
@@ -165,7 +165,7 @@ public:
 		//TODO get the file from FTP
 		//added by sam 20170525 to get the PA mesages through FTP START
 		string localfilename = "/Users/sms/a.txt", remotefilename = "PAServer/config/instant.txt";
-		getFile(localfilename, remotefilename, "anonymous", "sms", "128.12.46.246"); //TODO *** solve the problem if the FTP is not ON
+		getFile(localfilename, remotefilename, "anonymous", "sms", "128.12.46.246"); //tmp by sam 201707130845 //TODO *** solve the problem if the FTP is not ON
 		loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
 		//added by sam 20170525 to get the PA mesages through FTP FINISH
 

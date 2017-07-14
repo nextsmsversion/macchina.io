@@ -167,8 +167,18 @@ public:
 		//1) SMS connect to PA
 		//2) Press Night On
 		//3) start this server and this message sent to PA to trigger Night Off
-		char paMsg[16]="0003C22FN100@71";
-		paMsg[15] = '\n';
+		//tmp by sam 20170714 char paMsg[16]="0003C22FN100@71";
+		//tmp by sam 20170714 paMsg[15] = '\n';
+		/**
+		 * TODO by sam 20170714 add schedule **/
+		 //char paMsg[200]= "0033C01SA216:15:50	  :  :  	once	   	#009#02.06.05.04.05.04.04#                                   00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              @FB";
+		 char paMsg[200]= "0021C01SA212:34:56	  :  :  	once	   	#009#10.01#                                                  00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              @FD";
+		 paMsg[199] = '\n';
+		 //char paMsg[213]= "0005C22SA100:00:00	  :  :  	once	   	#X0000000000380E00#02.01#                                    00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              P00000R000001@3B";
+		 //char paMsg[213]= "0003C22SA100:00:00	  :  :  	once	   	#X0000000000380E00#02.01#                                    00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              P00000R000001@3D";
+		 //paMsg[212] = '\n';
+		 cerr << "LOG: Inside UrlPa:sendPaMsg JUST SENT SCHEDULE ADD command "  << endl;
+
 
 		send(_sockfd, paMsg, sizeof(paMsg), 0);
 		close(_sockfd);
