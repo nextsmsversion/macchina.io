@@ -124,14 +124,16 @@ public:
 	}
 
 	//TODO by sam keyword: sockfd; reference from devices/Simulation/src/BundleActivator & SimulatedSensor
-	std::string sendPaCommand(int nightMode) const
+	/** by sam 20170807 originally
+	std::string sendPaCommand(int nightMode) const */
+	std::string sendPaCommand(int nightMode, const std::string& schedTime) const
 	{
 		int _sockfrd = connectSocket();
-		sendPaMsg(_sockfrd);
+		sendPaMsg(_sockfrd, schedTime);
 		if(nightMode == 1){
 			return "Inside UrlPa: sendPaCommand OFF";
 		}else{
-			return "Inside UrlPa: sendPaCommand ON";
+			return schedTime; //by sam 20170807 "Inside UrlPa: sendPaCommand ON";
 		}
 	}
 	
@@ -156,9 +158,10 @@ public:
 
 		return sockfd;
 	}
-
-	void sendPaMsg(int _sockfd) const{
-		cerr << "LOG: Inside UrlPa:sendPaMsg BEGIN "  << endl;
+	/** by sam 20170807
+	void sendPaMsg(int _sockfd) const{ **/
+	void sendPaMsg(int _sockfd, const std::string& schedTime) const{
+		cerr << "LOG: Inside UrlPa:sendPaMsg BEGIN for time:" << schedTime << endl;
 		int flag =1;
 		setsockopt(_sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
 
@@ -167,17 +170,31 @@ public:
 		//1) SMS connect to PA
 		//2) Press Night On
 		//3) start this server and this message sent to PA to trigger Night Off
-		//tmp by sam 20170714 char paMsg[16]="0003C22FN100@71";
-		//tmp by sam 20170714 paMsg[15] = '\n';
-		/**
-		 * TODO by sam 20170714 add schedule **/
-		 //char paMsg[200]= "0033C01SA216:15:50	  :  :  	once	   	#009#02.06.05.04.05.04.04#                                   00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              @FB";
-		 char paMsg[200]= "0021C01SA212:30:00	  :  :  	once	   	#009#10.01#                                                  00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              @FD";
-		 paMsg[199] = '\n';
-		 //char paMsg[213]= "0005C22SA100:00:00	  :  :  	once	   	#X0000000000380E00#02.01#                                    00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              P00000R000001@3B";
-		 //char paMsg[213]= "0003C22SA100:00:00	  :  :  	once	   	#X0000000000380E00#02.01#                                    00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              P00000R000001@3D";
-		 //paMsg[212] = '\n';
+		/**	Night Mode Model Msg:
+		char paMsg[16]="0003C22FN100@71";	*/
+		/** add schedule model message
+		char paMsg[200]= "0033C01SA216:15:50	  :  :  	once	   	#009#02.06.05.04.05.04.04#                                   00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              @FB"; */
 
+		char paMsg[200] = "0021C01SA212:30:00	  :  :  	once	   	#009#10.01#                                                  00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              @";
+
+		//20170807 by sam changing the time according to the 8 characters: 00:00:00
+		for(int schedIndex = 0; schedIndex< 8; schedIndex ++){
+			paMsg[10 + schedIndex ] = schedTime.at(schedIndex); //'2';
+		}
+		/**
+		paMsg[10 ] = schedTime.at(0); //'2';
+		paMsg[11 ] = '3';
+		paMsg[12 ] = ':';
+		paMsg[13 ] = '3';
+		paMsg[14 ] = '0';
+		paMsg[15 ] = ':';
+		paMsg[16 ] = '3';
+		paMsg[17 ] = '0';
+		**/
+
+		size_t len = strlen(paMsg);
+
+		//TODO by sam to make the individual method to calculate the checksum
 		 //by sam 20170804 START for calculating the checksum according to PPAddEndOfMessage
 		 static char ConvhexToChar[] = {'0','1','2','3','4','5','6','7','8','9',
 		 								'A','B','C','D','E','F'};
@@ -195,11 +212,12 @@ public:
 
 		 paMsg[200-3 ] = ConvhexToChar[firstDigit];
 		 paMsg[200-2 ] = ConvhexToChar[secondDigit];
+		 paMsg[200-1 ] = '\n';
 
 		 //by sam 20170804 FINISH for calculating the checksum according to PPAddEndOfMessage
 
 
-		 cerr << "LOG: Inside UrlPa:sendPaMsg JUST SENT SCHEDULE ADD command :" << ConvhexToChar[firstDigit] << ConvhexToChar[secondDigit] << endl;
+		 //tmp by sam 20170807 cerr << "LOG: Inside UrlPa:sendPaMsg JUST SENT SCHEDULE ADD command of length: "<< len << " checksum:" << ConvhexToChar[firstDigit] << ConvhexToChar[secondDigit] << endl;
 
 
 		send(_sockfd, paMsg, sizeof(paMsg), 0);

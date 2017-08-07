@@ -59,8 +59,9 @@ public:
 		/// Checks if a user has a specific permission.
 		///
 		/// Returns true if the user specified by userName has the specified permission.
-
-	virtual std::string sendPaCommand(int nightMode) const = 0;
+/** by sam 20170807 originally
+	virtual std::string sendPaCommand(int nightMode) const = 0;*/
+	virtual std::string sendPaCommand(int nightMode, const std::string& schedTime ) const = 0;
 	// Service
 	const std::type_info& type() const;
 	bool isA(const std::type_info& otherType) const;

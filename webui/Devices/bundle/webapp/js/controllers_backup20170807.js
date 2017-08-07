@@ -5,11 +5,8 @@ var devicesControllers = angular.module('devicesControllers', []);
 devicesControllers.service('DeviceService', ['$http',
   function($http) {
 	//var inputdata = $.param({action : "msgPa", bundle : "io.bundle.devices"});
-	/** by sam 20170807 originally 
     this.post = function(inputAction, inputSymbolicName, inputId) {
-    	var inputdata = $.param({action : inputAction, bundle : inputSymbolicName, input : inputId}); */
-    this.post = function(inputAction, inputSymbolicName, inputId, schedTime) {
-    	var inputdata = $.param({action : inputAction, bundle : inputSymbolicName, input : inputId, time : schedTime});
+    	var inputdata = $.param({action : inputAction, bundle : inputSymbolicName, input : inputId});
     	var request =     		  
     	{ 
 		        method: "POST", 
@@ -24,10 +21,8 @@ devicesControllers.service('DeviceService', ['$http',
     		.error(		function() {	alert("Oops.. something wrong");});
     };
 
-    this.paMsg = function(symbolicName, inputId, schedTime) {
-    /** by sam 20170807 originally 
-      this.post('paMsg', symbolicName, inputId);	**/
-      this.post('paMsg', symbolicName, inputId, schedTime);
+    this.paMsg = function(symbolicName, inputId) {
+      this.post('paMsg', symbolicName, inputId);
     };
     this.simplepaMsg = function() {
         //alert("inside the simplepaMsg");
@@ -44,15 +39,13 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
     $scope.devices = [];
     $scope.orderBy = "name";
     
-    $scope.sendPaMessage = function(msgId, schedTime) {
-    	//by sam 20170807
-    	alert(schedTime);
+    $scope.sendPaMessage = function(msgId) {
     	//by sam 20170705
         $http.get('/macchina/devices/devices.jss').success(function(data) {
             $scope.devices = data;
           });
         
-    	DeviceService.paMsg('io.macchina.sched', msgId, schedTime);
+    	DeviceService.paMsg('io.macchina.sched', msgId);
         //tmp debugging in case there is no DeviceService.simplepaMsg();
     	
       }

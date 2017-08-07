@@ -130,11 +130,14 @@ void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& re
 	std::string testAction = form.get("action", "xxx");//by sam 20170623
 	std::string testBundle = form.get("bundle", "xxx");//by sam 20170623
 	std::string testInput = form.get("input", "xxx");//by sam 20170623
+	std::string testTime = form.get("time", "xxx");//by sam 20170807
 	if (context()->logger().information() && testAction.compare("paMsg") == 0){
-			context()->logger().information(Poco::format("BundleActionsRequestHandler.cpp Receiving action %s on bundle %s MsgType: %s.", testAction, testBundle, testInput)); //by sam
+			context()->logger().information(Poco::format("BundleActionsRequestHandler.cpp Receiving action %s on bundle %s MsgType: %s at time: %s.", testAction, testBundle, testInput, testTime)); //by sam
 			Poco::OSP::Auth::PaService::Ptr pPaService = Poco::OSP::ServiceFinder::findByName<Poco::OSP::Auth::PaService>(context(), "osp.urlpa");
 			context()->logger().information("Calling <pPaService->sendPaCommand()>");
-			context()->logger().information(pPaService->sendPaCommand(0));
+			/** by sam 20170807
+			context()->logger().information(pPaService->sendPaCommand(0));*/
+			context()->logger().information(pPaService->sendPaCommand(0, testTime));
 	}
 	Poco::OSP::Bundle::Ptr pBundle = installHandler.bundle();
 	if (pBundle)

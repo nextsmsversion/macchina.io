@@ -258,7 +258,8 @@ as long as the bullet point is removed, this can be put back
                                         <input type="text" class="form-control" placeholder="Placeholder text" style="margin-left: 20px">
                                         -->
                                         <label class="control-label">TIME: </label>
-                                        <input value="00:00:00" type="text" class="form-control" placeholder="__:__:__" style="margin-left: 2px;width: 50px">
+                                        <!-- 20170807 by sam  to add customized schedTime -->
+                                        <input type="text" ng-model="schedTime" value="00:00:00" class="form-control" placeholder="__:__:__" style="margin-left: 2px;width: 50px">
                                         <label class="control-label" style="margin-left: 2px">Zone Code: </label>
                                         <input id="txtTab2ZoneCode" type="text" class="form-control" placeholder="#___" style="margin-left: 2px;width: 30px">
                                         <label class="control-label" style="margin-left: 2px">Msg Code: </label>
@@ -291,7 +292,8 @@ as long as the bullet point is removed, this can be put back
                                         </table>
                                         <!-- 20170607 by sam  TODO trigger an action in C++ by addMethodHandler -->
                                     </div>
-                                    <button ng-click="sendPaMessage(states.activeItem)" type="button" class="btn btn-default">SAVE</button>
+                                    <!-- 20170807 by sam  to add customized schedTime -->
+                                    <button ng-click="sendPaMessage(states.activeItem, schedTime)" type="button" class="btn btn-default">SAVE</button>
                                     <button type="button" class="btn btn-default">DELETE</button>
                                     <button type="button" class="btn btn-default" style="margin-left: 30px">Edit</button>
                                     <button type="button" class="btn btn-default">Del Line</button>
