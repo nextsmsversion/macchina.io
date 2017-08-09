@@ -8,8 +8,8 @@ devicesControllers.service('DeviceService', ['$http',
 	/** by sam 20170807 originally 
     this.post = function(inputAction, inputSymbolicName, inputId) {
     	var inputdata = $.param({action : inputAction, bundle : inputSymbolicName, input : inputId}); */
-    this.post = function(inputAction, inputSymbolicName, inputId, schedTime) {
-    	var inputdata = $.param({action : inputAction, bundle : inputSymbolicName, input : inputId, time : schedTime});
+    this.post = function(inputAction, inputSymbolicName, inputId, schedTime, zoneCode, msgCode, weekday) {
+    	var inputdata = $.param({action : inputAction, bundle : inputSymbolicName, input : inputId, time : schedTime, zone: zoneCode, msg: msgCode, week: weekday});
     	var request =     		  
     	{ 
 		        method: "POST", 
@@ -24,10 +24,10 @@ devicesControllers.service('DeviceService', ['$http',
     		.error(		function() {	alert("Oops.. something wrong");});
     };
 
-    this.paMsg = function(symbolicName, inputId, schedTime) {
+    this.paMsg = function(symbolicName, inputId, schedTime, zoneCode, msgCode, weekday) {
     /** by sam 20170807 originally 
       this.post('paMsg', symbolicName, inputId);	**/
-      this.post('paMsg', symbolicName, inputId, schedTime);
+      this.post('paMsg', symbolicName, inputId, schedTime, zoneCode, msgCode, weekday);
     };
     this.simplepaMsg = function() {
         //alert("inside the simplepaMsg");
@@ -44,15 +44,17 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
     $scope.devices = [];
     $scope.orderBy = "name";
     
-    $scope.sendPaMessage = function(msgId, schedTime) {
-    	//by sam 20170807
-    	alert(schedTime);
+    $scope.sendPaMessage = function(msgId, schedTime,zoneCode, msgCode) {//by sam 20170807 to add schedTime
     	//by sam 20170705
+    	var chkweekday = document.getElementById('schedDayField').value ;
+    	//if the user has not clicked any weekday input
+    	if(chkweekday!=1 && chkweekday!=2 && chkweekday!=3 && chkweekday!=4 && chkweekday!=5 && chkweekday!=6 && chkweekday!=7){
+    		alert('Please select the day for the schedule');	
+    	}
         $http.get('/macchina/devices/devices.jss').success(function(data) {
             $scope.devices = data;
           });
-        
-    	DeviceService.paMsg('io.macchina.sched', msgId, schedTime);
+    	DeviceService.paMsg('io.macchina.sched', msgId, schedTime,zoneCode, msgCode, $scope.weekday);
         //tmp debugging in case there is no DeviceService.simplepaMsg();
     	
       }
@@ -66,7 +68,8 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
     
     $scope.setZoneCode = function(zoneId) {
       document.getElementById('txtZoneCode').value = zoneId;//for all zone '#099';
-      document.getElementById('txtTab2ZoneCode').value = zoneId;
+      document.getElementById('txtTab2ZoneCode').value = zoneId;//setting txtTab2ZoneCode 
+      $scope.zoneCodeV = zoneId;
     }
     
     //msgIDTxt
@@ -77,11 +80,13 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
         instantMsgCodeHeader =instantMsgCodeHeader + indexMsgIDTxt;
         document.getElementById('txtTab1MsgCode').value = instantMsgCodeHeader;
         document.getElementById('txtTab2MsgCode').value = instantMsgCodeHeader;
+        $scope.msgCodeValue = instantMsgCodeHeader;	//by sam 201708091400 angularjs set value
       }
     
     $scope.schedDayFieldInput = function(schedDay) {
     	
         document.getElementById('schedDayField').value = schedDay;
+        $scope.weekday = schedDay; //by sam 201708091400 angularjs set value
       }
     
     $interval(function() {

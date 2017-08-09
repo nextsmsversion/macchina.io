@@ -131,13 +131,16 @@ void BundleActionsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& re
 	std::string testBundle = form.get("bundle", "xxx");//by sam 20170623
 	std::string testInput = form.get("input", "xxx");//by sam 20170623
 	std::string testTime = form.get("time", "xxx");//by sam 20170807
+	std::string testZone = form.get("zone", "xxx");//by sam 20170809
+	std::string testMsg = form.get("msg", "xxx");//by sam 201708091340
+	std::string testWeekDay = form.get("week", "x");//by sam 201708091340
 	if (context()->logger().information() && testAction.compare("paMsg") == 0){
-			context()->logger().information(Poco::format("BundleActionsRequestHandler.cpp Receiving action %s on bundle %s MsgType: %s at time: %s.", testAction, testBundle, testInput, testTime)); //by sam
+			context()->logger().information(Poco::format("BundleActionsRequestHandler.cpp Receiving action %s on bundle %s MsgType: %s at time: %s on zone: %s with MSG: %s on: %s.", testAction, testBundle, testInput, testTime, testZone, testMsg, testWeekDay)); //by sam
 			Poco::OSP::Auth::PaService::Ptr pPaService = Poco::OSP::ServiceFinder::findByName<Poco::OSP::Auth::PaService>(context(), "osp.urlpa");
 			context()->logger().information("Calling <pPaService->sendPaCommand()>");
 			/** by sam 20170807
 			context()->logger().information(pPaService->sendPaCommand(0));*/
-			context()->logger().information(pPaService->sendPaCommand(0, testTime));
+			context()->logger().information(pPaService->sendPaCommand(0, testTime, testZone, testMsg, testWeekDay)); //
 	}
 	Poco::OSP::Bundle::Ptr pBundle = installHandler.bundle();
 	if (pBundle)

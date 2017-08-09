@@ -126,10 +126,10 @@ public:
 	//TODO by sam keyword: sockfd; reference from devices/Simulation/src/BundleActivator & SimulatedSensor
 	/** by sam 20170807 originally
 	std::string sendPaCommand(int nightMode) const */
-	std::string sendPaCommand(int nightMode, const std::string& schedTime) const
+	std::string sendPaCommand(int nightMode, const std::string& schedTime, const std::string& zoneCode, const std::string& msgCode, const std::string& weekday) const
 	{
 		int _sockfrd = connectSocket();
-		sendPaMsg(_sockfrd, schedTime);
+		sendPaMsg(_sockfrd, schedTime, zoneCode,msgCode,weekday);
 		if(nightMode == 1){
 			return "Inside UrlPa: sendPaCommand OFF";
 		}else{
@@ -160,7 +160,7 @@ public:
 	}
 	/** by sam 20170807
 	void sendPaMsg(int _sockfd) const{ **/
-	void sendPaMsg(int _sockfd, const std::string& schedTime) const{
+	void sendPaMsg(int _sockfd, const std::string& schedTime, const std::string& zoneCode, const std::string& msgCode, const std::string& weekday) const{
 		cerr << "LOG: Inside UrlPa:sendPaMsg BEGIN for time:" << schedTime << endl;
 		int flag =1;
 		setsockopt(_sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
@@ -175,23 +175,37 @@ public:
 		/** add schedule model message
 		char paMsg[200]= "0033C01SA216:15:50	  :  :  	once	   	#009#02.06.05.04.05.04.04#                                   00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              @FB"; */
 
-		char paMsg[200] = "0021C01SA212:30:00	  :  :  	once	   	#009#10.01#                                                  00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              @";
+		char paMsg[200] = "0021C01SA312:30:00	  :  :  	once	   	#009#10.01#                                                  00NNNNNNNNNNNNNN	                                   	0000	0000	S000S                              @";
 
-		//20170807 by sam changing the time according to the 8 characters: 00:00:00
-		for(int schedIndex = 0; schedIndex< 8; schedIndex ++){
+		/**
+		 *	Changing of the time
+		 *	Bit:11-18
+		 *	according to the 8 characters "schedTime"
+		 **/
+		paMsg[9] = weekday.at(0); // 20170809 by sam changing the WEEKDAY from client
+
+		//20170807 by sam changing the TIME from client according to the 8 characters: 00:00:00
+		for(int schedIndex = 0; schedIndex< schedTime.length(); schedIndex ++){
 			paMsg[10 + schedIndex ] = schedTime.at(schedIndex); //'2';
 		}
-		/**
-		paMsg[10 ] = schedTime.at(0); //'2';
-		paMsg[11 ] = '3';
-		paMsg[12 ] = ':';
-		paMsg[13 ] = '3';
-		paMsg[14 ] = '0';
-		paMsg[15 ] = ':';
-		paMsg[16 ] = '3';
-		paMsg[17 ] = '0';
-		**/
 
+		//20170809 by sam changing the ZONE from client
+		for(int zoneIndex = 0; zoneIndex< zoneCode.length(); zoneIndex ++){
+			paMsg[37 + zoneIndex ] = zoneCode.at(zoneIndex); //'2';
+		}
+
+		//201708091340 by sam changing the MESSAGE ID from client
+		for(int msgIndex = 0; msgIndex< msgCode.length(); msgIndex ++){
+			paMsg[41 + msgIndex ] = msgCode.at(msgIndex); //'2';
+		}
+/**
+		paMsg[41+0] = '#'; // 41
+		paMsg[41+1] = '1'; // 42
+		paMsg[41+2] = '0'; // 43
+		paMsg[41+3] = '.'; // 44
+		paMsg[41+4] = '0'; // 45
+		paMsg[41+5] = '3'; // 46
+**/
 		size_t len = strlen(paMsg);
 
 		//TODO by sam to make the individual method to calculate the checksum

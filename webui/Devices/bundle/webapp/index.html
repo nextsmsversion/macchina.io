@@ -163,7 +163,8 @@ as long as the bullet point is removed, this can be put back
                         </div>
                         <div style="margin-top: -10px">
                             <button type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 16px;padding-left: 20;position: relative;margin-left: 20px">All Plat</button>
-                            <button type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 20px;padding-left: 20;position: relative;margin-left: 20px">Plat 1</button>
+                            <button ng-click="setZoneCode('#01*')" type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 20px;padding-left: 20;position: relative;margin-left: 20px">Plat 1</button>
+                            <button ng-click="setZoneCode('#02*')" type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 20px;padding-left: 20;position: relative;margin-left: 20px">Plat 2</button>
                         </div>
                         <div style="padding-top: 5px">
                             <button ng-click="setZoneCode('')" type="button" class="bg-success" style="color: #f4eeee;background-color: #4e9e70;width: 80px;height: 60px;font-size: 16px;padding-left: 20;position: relative;margin-left: 20px"> Clear</button>
@@ -261,9 +262,10 @@ as long as the bullet point is removed, this can be put back
                                         <!-- 20170807 by sam  to add customized schedTime -->
                                         <input type="text" ng-model="schedTime" value="00:00:00" class="form-control" placeholder="__:__:__" style="margin-left: 2px;width: 50px">
                                         <label class="control-label" style="margin-left: 2px">Zone Code: </label>
-                                        <input id="txtTab2ZoneCode" type="text" class="form-control" placeholder="#___" style="margin-left: 2px;width: 30px">
+                                        <!-- 20170808 by sam  to add customized zoneCodeValue -->
+                                        <input type="text" ng-model="zoneCodeV" value="#009" class="form-control" placeholder="#___" style="margin-left: 2px;width: 30px" id="txtTab2ZoneCode" >
                                         <label class="control-label" style="margin-left: 2px">Msg Code: </label>
-                                        <input id="txtTab2MsgCode" type="text" class="form-control" placeholder="#10.__.__.__.__.__.__.__.__.__.__.__.__.__" style="margin-left: 4px;width: 105px">
+                                        <input id="txtTab2MsgCode" type="text" ng-model="msgCodeValue" class="form-control" placeholder="#10.__.__.__.__.__.__.__.__.__.__.__.__.__" style="margin-left: 4px;width: 105px">
                                         <label class="control-label" style="margin-left: 4px">Description: </label>
                                         <input type="text" class="form-control" placeholder="comment" style="margin-left: 4px;width: 50px">
                                     </div>
@@ -293,7 +295,7 @@ as long as the bullet point is removed, this can be put back
                                         <!-- 20170607 by sam  TODO trigger an action in C++ by addMethodHandler -->
                                     </div>
                                     <!-- 20170807 by sam  to add customized schedTime -->
-                                    <button ng-click="sendPaMessage(states.activeItem, schedTime)" type="button" class="btn btn-default">SAVE</button>
+                                    <button ng-click="sendPaMessage(states.activeItem, schedTime, zoneCodeV, msgCodeValue)" type="button" class="btn btn-default">SAVE</button>
                                     <button type="button" class="btn btn-default">DELETE</button>
                                     <button type="button" class="btn btn-default" style="margin-left: 30px">Edit</button>
                                     <button type="button" class="btn btn-default">Del Line</button>
@@ -303,13 +305,13 @@ as long as the bullet point is removed, this can be put back
                                     <!-- 20170712 -->
                                     <!-- 20170529 by sam FINISH originally  <div ng-controller="DevicesCtrl" class="groupbox"> -->
                                     <div id="my_styles">
-                                        <button type="submit" ng-click="schedDayFieldInput('MON')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;-webkit-appearance: none;">MON</button>
-                                        <button type="submit" ng-click="schedDayFieldInput('TUE')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">TUE</button>
-                                        <button type="submit" ng-click="schedDayFieldInput('WED')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">WED</button>
-                                        <button type="submit" ng-click="schedDayFieldInput('THU')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">THU</button>
-                                        <button type="submit" ng-click="schedDayFieldInput('FRI')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">FRI</button>
-                                        <button type="submit" ng-click="schedDayFieldInput('SAT')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">SAT</button>
-                                        <button type="submit" ng-click="schedDayFieldInput('SUN')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">SUN</button>
+                                        <button type="submit" ng-click="schedDayFieldInput('1')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;-webkit-appearance: none;">MON</button>
+                                        <button type="submit" ng-click="schedDayFieldInput('2')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">TUE</button>
+                                        <button type="submit" ng-click="schedDayFieldInput('3')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">WED</button>
+                                        <button type="submit" ng-click="schedDayFieldInput('4')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">THU</button>
+                                        <button type="submit" ng-click="schedDayFieldInput('5')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">FRI</button>
+                                        <button type="submit" ng-click="schedDayFieldInput('6')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">SAT</button>
+                                        <button type="submit" ng-click="schedDayFieldInput('7')" class="btn btn-warning" style="color: #0c0101;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;-webkit-appearance: none;">SUN</button>
                                         <!--
                                         <button ng-click="sendPaMessage(states.activeSched)" type="submit" class="btn btn-warning" id="1" style="color: #0c0101;background-color: #b7abab;width: 80px;height: 40px;font-size: 12px;">MON</button>
                                         <button ng-click="sendPaMessage(states.activeSched)" type="submit" class="btn btn-warning" id="2" style="color: #0c0101;background-color: #b7abab;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;">TUE</button>
@@ -321,7 +323,7 @@ as long as the bullet point is removed, this can be put back
 										-->
                                     </div>
                                     <input ng-model="states.activeSched" type="text" id="msgIDTxtSched" visibility="false" class="invisible" style="width: 80px;margin-top: 10px;" />
-                                    <input type="text" id="schedDayField" visibility="false" class="invisible" style="width: 80px;margin-top: 10px;" />
+                                    <input type="text" ng-model="weekday" id="schedDayField" visibility="false" class="invisible" style="width: 80px;margin-top: 10px;" />
                                 </li>                                 
                                 <!-- 20170712 -->
                             </ul>
