@@ -75,6 +75,87 @@ namespace IoT {
 namespace Simulation {
 
 
+class PaUpdateTimerTask: public Poco::Util::TimerTask
+{
+private:
+	int _cycles;
+	int _count;
+
+	//std::map<int,string> _instantMsgMap;
+
+public:
+	PaUpdateTimerTask()
+/**	tmp by sam
+	PaUpdateTimerTask(std::map<int,string> instantMsgMap):
+		_instantMsgMap(instantMsgMap)
+**/
+	{
+
+	}
+
+	void run()
+	{
+		++_count;
+		//tmp by sam 20170831 if (_count == _cycles)
+		{//for every cycle
+
+				cerr << "Inside PaUpdateTimerTask::instantMsgMap" <<endl;
+				cerr << "PaUpdateTimerTask::up running .." <<endl;
+				string localfilename = "/Users/sms/a.txt", remotefilename = "PAServer/config/instant.txt";
+				try{
+					if(getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.109.246")){ //tmp by sam 201707130845
+						//connection is alright -> do nothing
+					}else{
+						//tmp by sam	_instantMsgMap.clear();	//by sam 20170822 trial
+						cerr << "20170831 PaUpdateTimerTask::instantMsgMap Clear : getFile else condition .." <<endl;
+					}
+				}
+				catch (Exception& e1)
+				{
+					//tmp by sam	_instantMsgMap.clear();	//by sam 20170822 trial
+					cerr << "20170831 PaUpdateTimerTask::instantMsgMap Clear : getFile else Exception .." <<endl;
+				}
+		}
+	}
+
+/*** getFile -> SmsUpdatePa::ThreadUpdateFtp //COPY from remote to local file path
+ * reference from
+ * https://git.sch.bme.hu/kk1205/raspberrycloud/blob/cachemeres/program/Source/cloud/FTPAdapter.cpp
+ * @param	string localfilename	"/Users/sms/a.txt",
+ * 			string remotefilename	"a.txt"
+ * 			string USERNAME 		"ftpuser";
+ * 			string PASSWORD 		"ftp123456";
+ * 			string HOST 			"128.13.109.246";
+ */
+	bool getFile(	string localfilename, string remotefilename,
+					string USERNAME, string PASSWORD, string HOST){
+		//cerr << "LOG: Inside PaUpdateTimerTask getFile"  << endl;
+		//added by sam 20170518 for establishing FTP session START
+		FTPClientSession session(HOST, FTPClientSession::FTP_PORT, USERNAME, PASSWORD);
+		Path localFilePath(localfilename);
+		ofstream file(localFilePath.toString(), ios::out | ios::binary);	//TODO by sam to set to ASCII??
+		//added by sam 20170518 for establishing FTP session FINISH
+
+		//added by sam 20170522 for trying FTP downloading file to local file START
+		try {
+				session.setFileType(FTPClientSession::TYPE_BINARY);
+				auto& is = session.beginDownload(remotefilename);
+				StreamCopier::copyStream(is, file);
+				//session.endDownload();	//TODO throw exception??
+		}
+		catch (FTPException& e) {
+			cerr << "20170822 debug error: " << e.message() << endl;
+			//under the case the PA server is not existing/up
+			return false;
+		}
+		return true;
+		//added by sam 20170522 for trying FTP downloading file to local file FINISH
+	}
+
+
+};
+
+
 class BundleActivator: public Poco::OSP::BundleActivator
 {
 public:
@@ -86,11 +167,13 @@ public:
 	{
 	}
 	
-	void createSensor(const SimulatedSensor::Params& params, int tmpSockfrd)
+	void createSensor(const SimulatedSensor::Params& params, int tmpSockfrd, std::map<int,string> instantMsgMap)
 	{
 		typedef Poco::RemotingNG::ServerHelper<IoT::Devices::Sensor> ServerHelper;
-		
+
 		Poco::SharedPtr<SimulatedSensor> pSensor = new SimulatedSensor(params, *_pTimer, tmpSockfrd);
+
+
 		ServerHelper::RemoteObjectPtr pSensorRemoteObject = ServerHelper::createRemoteObject(pSensor, params.id);
 		
 		Properties props;
@@ -124,7 +207,7 @@ public:
 
 	//added by sam 20170601 for adding socket to connect to PA server START
 	//reference : InitClient EtherUtils.cpp
-	int connectSocket(){
+	bool connectSocket(){
 		struct sockaddr_in dest;
 		char buffer[128];
 
@@ -135,16 +218,21 @@ public:
 		bzero(&dest, sizeof(dest));
 		dest.sin_family = AF_INET;
 		dest.sin_port = htons(1100);
-		dest.sin_addr.s_addr = inet_addr("128.12.46.246");
+		dest.sin_addr.s_addr = inet_addr("128.13.109.246");
 
 		/**connecting to server**/
-		connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));//tmp by sam 201707130845
+		int result = connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
 		/** Receive messge from the server and print to screen */
 		//bzero(buffer, 128);
 		//recv(sockfd, buffer, sizeof(buffer), 0);
 		//printf("receive from server : %s\n", buffer);
 
-		return sockfd;
+		//by sam 20170822 to test if PA server is up
+		if(result == 0){
+			return true;
+		}else{
+			return false;
+		}
 		//close(sockfd);
 	}
 	//added by sam 20170601 for adding socket to connect to PA server FINISH
@@ -155,49 +243,68 @@ public:
 		_pContext = pContext;
 		_pPrefs = ServiceFinder::find<PreferencesService>(pContext);
 
+		//20170831 by sam to setup a timer
+		if(!instantMsgMap.empty())
+		//if(*instantMsgMap != NULL)
+		{
+			long interval = 100;
+			_pTimer->scheduleAtFixedRate(new PaUpdateTimerTask(), interval, interval);
+
+			cerr << "new PaUpdateTimerTask at 201708311029 for checking connection of PA" << endl;
+		}
 
 		//TODO by sam reference: BOOL PPOpenObject to connect to PA server as client
-
-		if(sockfd == 0){//added by sam 20170606
-			sockfd = connectSocket();//added by sam 20170601 for adding socket to connect to PA server
-		}
+		//TODO by sam 20170822 to handle the case PA has not been switched on
+		//by sam 20170822 	if(sockfd == 0){//added by sam 20170606
+		//by sam 20170822 		sockfd = connectSocket();//added by sam 20170601 for adding socket to connect to PA server
+		//by sam 20170822 	}
 
 		//TODO get the file from FTP
 		//added by sam 20170525 to get the PA mesages through FTP START
 		string localfilename = "/Users/sms/a.txt", remotefilename = "PAServer/config/instant.txt";
-		getFile(localfilename, remotefilename, "anonymous", "sms", "128.12.46.246"); //tmp by sam 201707130845 //TODO *** solve the problem if the FTP is not ON
-		loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
+		//if(connectSocket() == true)
+		{ //by sam 20170822 when PA server is valid
+		//	getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.109.246"); //tmp by sam 201707130845 //TODO *** solve the problem if the FTP is not ON
+		//	loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
+		}
 		//added by sam 20170525 to get the PA mesages through FTP FINISH
 
-		///added by sam 20170524 for setting timer to update the PA from FTP START
-		for(int i=1; i< 9 ;i++ )	//added by sam 20170529
-		{
-			std::string baseKey = "PA.instantMessage.";
-			SimulatedSensor::Params params;
-			params.id = std::to_string(i);	//this must be only number otherwise, cannot perform: Poco::AnyCast<string>(_sensor._deviceIdentifier);
+		//if(connectSocket() == true){	//by sam 20170822
+		//bool testingPAserverIsUp = connectSocket();	//testing if PA server is up
 
-			params.physicalQuantity = instantMsgMap[i]; //"db";// _pPrefs->configuration()->getString(baseKey + ".physicalQuantity", "");
-			params.physicalUnit     = "db";// _pPrefs->configuration()->getString(baseKey + ".physicalUnit", "");
-			params.initialValue     = -6.0;// _pPrefs->configuration()->getDouble(baseKey + ".initialValue", 0.0);
-			params.delta            = -6.0;// _pPrefs->configuration()->getDouble(baseKey + ".delta", 0.0);
-			params.cycles           = 100; //_pPrefs->configuration()->getInt(baseKey + ".cycles", 0);
-			params.updateRate       = 11.0;//_pPrefs->configuration()->getDouble(baseKey + ".updateRate", 0.0);
-			params.mode = SimulatedSensor::SIM_LINEAR;
+			///added by sam 20170524 for setting timer to update the PA from FTP START
+			for(int i=1; i< 9 ;i++ )	//added by sam 20170529
+			{
+				std::string baseKey = "PA.instantMessage.";
+				SimulatedSensor::Params params;
+				params.id = std::to_string(i);	//this must be only number otherwise, cannot perform: Poco::AnyCast<string>(_sensor._deviceIdentifier);
 
-			try
-			{
-				createSensor(params, sockfd);
+				params.physicalQuantity = instantMsgMap[i]; //"db";// _pPrefs->configuration()->getString(baseKey + ".physicalQuantity", "");
+				params.physicalUnit     = "db";// _pPrefs->configuration()->getString(baseKey + ".physicalUnit", "");
+				params.initialValue     = -6.0;// _pPrefs->configuration()->getDouble(baseKey + ".initialValue", 0.0);
+				params.delta            = -6.0;// _pPrefs->configuration()->getDouble(baseKey + ".delta", 0.0);
+				params.cycles           = 100; //_pPrefs->configuration()->getInt(baseKey + ".cycles", 0);
+				params.updateRate       = 11.0;//_pPrefs->configuration()->getDouble(baseKey + ".updateRate", 0.0);
+				params.mode = SimulatedSensor::SIM_LINEAR;
+
+				try
+				{
+					//if(testingPAserverIsUp == true)
+					{
+						createSensor(params, sockfd, instantMsgMap);
+					}
+				}
+				catch (Poco::Exception& exc)
+				{
+					pContext->logger().error(Poco::format("Cannot create simulated sensor: %s", exc.displayText()));
+				}
 			}
-			catch (Poco::Exception& exc)
-			{
-				pContext->logger().error(Poco::format("Cannot create simulated sensor: %s", exc.displayText()));
-			}
-		}
-		//added by sam 20170524 for setting timer to update the PA from FTP FINISH
+
+			//added by sam 20170524 for setting timer to update the PA from FTP FINISH
 
 	}
 	void loadFile(	string localfilename){
-		cerr << "LOG: Inside LinearUpdateTimerTask loadFile"  << endl;
+		cerr << "LOG: Inside PaUpdateTimerTask loadFile"  << endl;
 
 		//added by sam 20170523 filestream START
 		string line;
@@ -250,11 +357,11 @@ public:
 	 * 			string remotefilename	"a.txt"
 	 * 			string USERNAME 		"ftpuser";
 	 * 			string PASSWORD 		"ftp123456";
-	 * 			string HOST 			"128.12.46.246";
+	 * 			string HOST 			"128.13.109.246";
 	 */
 	void getFile(	string localfilename, string remotefilename,
 						string USERNAME, string PASSWORD, string HOST){
-			cerr << "LOG: Inside LinearUpdateTimerTask getFile"  << endl;
+			cerr << "LOG: Inside PaUpdateTimerTask getFile"  << endl;
 			try {
 			//added by sam 20170518 for establishing FTP session START
 			FTPClientSession session(HOST, FTPClientSession::FTP_PORT, USERNAME, PASSWORD); cerr << "LOG: 246"  << endl;

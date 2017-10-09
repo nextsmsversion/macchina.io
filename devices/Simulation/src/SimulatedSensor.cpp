@@ -83,32 +83,95 @@ public:
 
 	void run()
 	{
-
-		string localfilename = "/Users/sms/a.txt", remotefilename = "PAServer/config/instant.txt";
-		getFile(localfilename, remotefilename, "anonymous", "sms", "128.12.46.246"); //tmp by sam 201707130845
-		loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
-
-		if (++_count == _cycles)
+		++_count;
+		//20170921 by sam debug flashing of the PA message: _sensor.setPhysicalQuantity("");	///by sam 20170906 anytime to clear first
+		//cerr << "_sensor setPhysicalQuantity has been cleared" << std::endl;
+		if (_count == _cycles){//for every cycle
+			//by sam 20170825
+			testPAconnectionSock = 0;
+		}
+		//by sam 20170822 to test connection before getting file
+		//otherwise the server would be waiting or looping around here
+		if(testPAconnection()==true)
 		{
-			_sensor.update(_initialValue);
+			string localfilename = "/Users/sms/a.txt", remotefilename = "PAServer/config/instant.txt";
+			try{
+				if(getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.109.246")){ //tmp by sam 201707130845
+					loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
+				}
+			}
+			catch (Exception& e1)
+			{
+				//by sam 20170921 debug instantMsgMap.clear();	//by sam 20170822 trial
+				//by sam 20170921 debug _sensor.setPhysicalQuantity("");
+			}
+			//tmp by sam 201708829 for logging
+			//cerr << "testPAconnection is TRUE ~~~~~~~~~~~~~~~~~~" <<endl;
+		}
 
-			_sensor.setSymbolicName("INSTANT");	//added by sam 20170523 TODO get the PA instant name
-			_count = 0;
+		else
+		{
+			//tmp by sam 201708829 for logging
+			cerr << "testPAconnection is FALSE arriving here OR NEVER COME!!!!!" <<endl;
+			//tmp by sam 20170825 to clear the message
+			//by sam 20170921 debug instantMsgMap.clear();	//by sam 20170822 trial
+			//by sam 20170921 debug _sensor.setPhysicalQuantity("");
+		}
+
+		//by sam 20170706
+		string sensorStr = Poco::AnyCast<string>(_sensor._deviceIdentifier);
+		int thisSensorId = 	stoi(sensorStr);
+
+		_sensor.update(_initialValue);
+		_sensor.setPhysicalQuantity(instantMsgMap[thisSensorId]); //TODO how come this cannot update
+		_sensor.setSymbolicName("INSTANT");	//added by sam 20170523 TODO get the PA instant name
+
+
+		if (_count == _cycles)	//for every cycle
+		{
+			_count = 0;			//for re-counting of the cycle again
 		}
 		else
 		{
 			double value = _sensor.value();
 			value += _delta;
 			_sensor.update(value);
-
-			//by sam 20170706
-			string sensorStr = Poco::AnyCast<string>(_sensor._deviceIdentifier);
-			int thisSensorId = 	stoi(sensorStr);
-			_sensor.setPhysicalQuantity(instantMsgMap[thisSensorId]); //TODO how come this cannot update
-
-			_sensor.setSymbolicName("INSTANT"); //added by sam 20170523 TODO
 		}
 	}
+
+	/**
+	2017-08-25 01:19:00.751 [Notice] Application<22>: A thread was terminated by an unhandled exception: I/O error: Too many open files
+	2017-08-25 01:19:00.753 [Notice] Application<22>: A thread was terminated by an unhandled exception: I/O error: Too many open files
+	2017-08-25 01:19:00.755 [Notice] Application<22>: A thread was terminated by an unhandled exception: I/O error: Too many open files
+	2017-08-25 01:19:06.775 [Notice] Application<22>: A thread was terminated by an unhandled exception: I/O error: Too many open files
+	2017-08-25 01:19:06.777 [Notice] Application<22>: A thread was terminated by an unhandled exception: I/O error: Too many open files
+	2017-08-25 01:19:06.778 [Notice] Application<22>: A thread was terminated by an unhandled exception: I/O error: Too many open files
+	2017-08-25 01:19:07.880 [Notice] Application<22>: A thread was terminated by an unhandled exception: I/O error: Too many open files
+	2017-08-25 01:19:07.882 [Notice] Application<22>: A thread was terminated by an unhandled exception: I/O error: Too many open files
+	2017-08-25 01:19:07.884 [Notice] Application<22>: A thread was terminated by an unhandled exception: I/O error: Too many open files
+
+	2017-08-29 02:48:45.292 [Notice] Application<25>: A thread was terminated by an unhandled exception: Net Exception: Host is down: 128.13.109.246:21
+	**/
+
+	int testPAconnectionSock = 0;	//by sam 20170825 to move out of scope
+
+	bool testPAconnection(){		//TODO not good!!
+
+		//by sam 20170822 prevent tones of reconnection for several times
+		//if(testPAconnectionSock == 0)
+		{
+			/**create socket*/
+			testPAconnectionSock = socket(AF_INET, SOCK_STREAM, 0);
+			if(testPAconnectionSock < 0){	//the PA server is not up
+				cerr << "testPAconnectionSock error detected: " <<	testPAconnectionSock <<endl;
+				return false;
+			}
+			//cerr << "testPAconnectionSock detected: " << testPAconnectionSock <<endl;
+			close(testPAconnectionSock);	//by sam 20170822 to close
+		}
+		return true;
+	}
+
 	void loadFile(	string localfilename){
 		//cerr << "LOG: Inside LinearUpdateTimerTask loadFile"  << endl;
 
@@ -116,7 +179,7 @@ public:
 		string line;
 		std::ifstream myfile(localfilename);
 		if(myfile.is_open()){
-			instantMsgMap.clear();
+			//20170921 by sam debug instantMsgMap.clear();
 			while(getline(myfile,line)){	//for each line of the file
 				//added by sam 20170523 SmsFilePaMgr::ReadInstantMsgConfig for tokenizing the instant file START
 				//Suppose string line = "Instant 01E	Test Message";
@@ -159,9 +222,9 @@ public:
  * 			string remotefilename	"a.txt"
  * 			string USERNAME 		"ftpuser";
  * 			string PASSWORD 		"ftp123456";
- * 			string HOST 			"128.12.46.246";
+ * 			string HOST 			"128.13.109.246";
  */
-	void getFile(	string localfilename, string remotefilename,
+	bool getFile(	string localfilename, string remotefilename,
 					string USERNAME, string PASSWORD, string HOST){
 		//cerr << "LOG: Inside LinearUpdateTimerTask getFile"  << endl;
 		//added by sam 20170518 for establishing FTP session START
@@ -175,11 +238,14 @@ public:
 				session.setFileType(FTPClientSession::TYPE_BINARY);
 				auto& is = session.beginDownload(remotefilename);
 				StreamCopier::copyStream(is, file);
-				//session.endDownload();								//TODO throw exception??
+				//session.endDownload();	//TODO throw exception??
 		}
 		catch (FTPException& e) {
-			cerr << "error: " << e.message() << endl;
+			cerr << "20170822 debug error: " << e.message() << endl;
+			//under the case the PA server is not existing/up
+			return false;
 		}
+		return true;
 		//added by sam 20170522 for trying FTP downloading file to local file FINISH
 	}
 
@@ -356,7 +422,43 @@ SimulatedSensor::SimulatedSensor(const Params& params, Poco::Util::Timer& timer,
 	}
 
 }
+//by sam 20170906
+SimulatedSensor::SimulatedSensor(const Params& params, Poco::Util::Timer& timer, int tmpSockfrd, std::map<int,string> instantMsgMap):
+	_value(params.initialValue),
+	_valueChangedPeriod(0.0),
+	_valueChangedDelta(0.0),
+	_pEventPolicy(new IoT::Devices::NoModerationPolicy<double>(valueChanged)),
+	_deviceIdentifier(params.id),
+	_symbolicName(SYMBOLIC_NAME),
+	_name(NAME),
+	_physicalQuantity(params.physicalQuantity),
+	_physicalUnit(params.physicalUnit),
+	_timer(timer)
+{
+	addProperty("displayValue", &SimulatedSensor::getDisplayValue);
+	addProperty("valueChangedPeriod", &SimulatedSensor::getValueChangedPeriod, &SimulatedSensor::setValueChangedPeriod);
+	addProperty("valueChangedDelta", &SimulatedSensor::getValueChangedDelta, &SimulatedSensor::setValueChangedDelta);
+	addProperty("deviceIdentifier", &SimulatedSensor::getDeviceIdentifier);
+	addProperty("symbolicName", &SimulatedSensor::getSymbolicName);
+	addProperty("name", &SimulatedSensor::getName);
+	addProperty("physicalQuantity", &SimulatedSensor::getPhysicalQuantity);
+	addProperty("physicalUnit", &SimulatedSensor::getPhysicalUnit);
+	addProperty("PaMessage", &SimulatedSensor::PaMessage);
 
+	if (params.updateRate > 0)
+	{
+		long interval = 1000/params.updateRate;
+		if (params.mode == SIM_LINEAR)
+		{
+			_timer.scheduleAtFixedRate(new LinearUpdateTimerTask(*this, params.initialValue, params.delta, params.cycles, tmpSockfrd), interval, interval);
+		}
+		else
+		{
+			_timer.scheduleAtFixedRate(new RandomUpdateTimerTask(*this, params.initialValue, params.delta, params.cycles), interval, interval);
+		}
+	}
+
+}
 
 //added by sam 20170601 for adding socket to connect to PA server START
 //reference : InitClient EtherUtils.cpp

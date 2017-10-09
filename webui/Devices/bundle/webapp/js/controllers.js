@@ -94,7 +94,7 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
       $http.get('/macchina/devices/devices.jss').success(function(data) {
         $scope.devices = data;
       })
-    }, 10000);
+    }, 1000);	//tmp by sam 20170906 from 10 seconds to 1 second
   }]);
 
 devicesControllers.controller('SessionCtrl', ['$scope', '$http',

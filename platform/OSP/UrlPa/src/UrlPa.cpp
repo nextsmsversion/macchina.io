@@ -43,6 +43,11 @@
 #include <stdio.h>
 //added by sam 20170703 for adding socket to connect to PA server FINISH
 
+//added by sam 20171004 for timer receiving PA messages
+#include "Poco/Util/Timer.h"
+#include "Poco/Util/TimerTaskAdapter.h"
+//added by sam 20171004 for timer receiving PA messages
+
 //added by sam 20170518 for trying START
 #include <Poco/Path.h>
 #include <iostream>
@@ -93,10 +98,59 @@ public:
 		_userPermissions(userPermissions),
 		_salt(salt)
 	{
+		cerr << "UrlPaService constructor begin" <<	endl;
+		_pTimer = new Poco::Util::Timer;			//added by sam 20171004 for timer receiving PA messages
+		//_pTimer->schedule(new Poco::Util::TimerTaskAdapter<UrlPaService>(*this, &UrlPaService::reconnect), Poco::Timestamp());
+		_pTimer->scheduleAtFixedRate(new Poco::Util::TimerTaskAdapter<UrlPaService>(*this, &UrlPaService::reconnect), 250, 5000);
+		cerr << "UrlPaService constructor finish" <<	endl;
 	}
 	
+
 	~UrlPaService()
 	{
+	}
+
+
+	void reconnect(Poco::Util::TimerTask&)
+	{
+		cerr << "UrlPaService reconnect start" <<	endl;
+
+		int err = 0;
+		int index = 0;
+		int len = 0;
+		int timeout = 0;
+
+		//sEtherProtocol etherProtocol;	TODO use struct or not
+		BYTE   receiveMsg[4096]; // reception
+		/***/
+		int sockid = connectSocket();
+		err = ReceiveDataAFC(
+							index,
+							sockid,
+							(char*)receiveMsg,
+							&len,
+							timeout,
+							'\n' //AFC_MESSAGE_END,
+							);
+		//cerr << receiveMsg << endl;
+		/***/
+		/**TODO <1>	calling the following to receive PA message and output to data
+		*  int ReceiveDataAFC (
+		*	int index,
+		*	int soc,
+		*	char data[],
+		*	int *len,
+		*	int timeOut,
+		*	char end_marker,
+		*	bool start_marked,
+		*	char start_marker)
+		*
+		*	TODO <2> append the data[] to MQTT queue
+		*	TODO <3> check when there is update of PA, WEBSOCKET the web client
+		*	TODO <4> or the web client polling
+		***/
+
+		cerr << "UrlPaService reconnect finish" <<	endl;
 	}
 	
 	// AuthService
@@ -138,7 +192,6 @@ public:
 	}
 	
 
-
 	//added by sam 20170703 for adding socket to connect to PA server START
 	int connectSocket() const{
 		struct sockaddr_in dest;
@@ -151,7 +204,7 @@ public:
 		bzero(&dest, sizeof(dest));
 		dest.sin_family = AF_INET;
 		dest.sin_port = htons(1100);
-		dest.sin_addr.s_addr = inet_addr("128.12.46.246");//TODO by sam to get from parameter file
+		dest.sin_addr.s_addr = inet_addr("128.13.109.246");//TODO by sam to get from parameter file
 
 		/**connecting to server**/
 		connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
@@ -212,7 +265,7 @@ public:
 		 //by sam 20170804 START for calculating the checksum according to PPAddEndOfMessage
 		 static char ConvhexToChar[] = {'0','1','2','3','4','5','6','7','8','9',
 		 								'A','B','C','D','E','F'};
-		 typedef unsigned char BYTE;
+
 		 BYTE sum1 = 0;
 		 BYTE sum2;
 		 int i;
@@ -235,10 +288,105 @@ public:
 
 
 		send(_sockfd, paMsg, sizeof(paMsg), 0);
-		close(_sockfd);
+		//20171003	close(_sockfd);			//by sam comment if this is closed, client list of PA will not store duplicate entries
 
 	}
 	//added by sam 20170703 for adding socket to connect to PA server FINISH
+
+	//added by sam 20170929 for a general receiving function
+	int ReceiveDataAFC (
+			int index,
+			int soc,	/**SOCKET soc,**/
+			char data[],
+			int *len,
+			int timeOut,
+			char end_marker,
+			bool start_marked = false,
+			char start_marker = 0)
+	{
+		typedef unsigned char BYTE;
+
+		u_long lBytesInSocket = 0;
+		int err		= 0;
+		*len = 0;  // nothing is read  for the moment
+
+		 // we assume that the maximun length of a receive frame cannot exceed ETHER_LEN
+		//char temporaryBuffer[ETHER_LEN];
+
+		bool fStart = false;
+		bool fEnd   = false;
+		bool fOut   = false;
+		bool fAuthorizeStart = !(start_marked);
+
+		int nbByte = 0;
+		BYTE ch;
+
+		char buffer[512];
+		do  // this loop add been introduce in case of the applicative frame is sent in many TCP/IP frame
+		{
+			// First check if a read would block
+			//by sam 20170929	the timer will be set outside of this scope
+			//by sam 20170929	err = WillReadBlockWithTimeOut (soc,timeOut);
+			//by sam 20170929	if (err > 0)
+			{
+
+				err = recv(soc, (char*)&ch,1,0);						//TODO by sam why cannot this receive anything
+				if (err > 0)
+				{
+					// search the START character if it exists
+					if (((!fStart)&&(ch == (BYTE)start_marker))||(fAuthorizeStart))
+					{
+							// the start of the frame is found
+							fStart = true;
+							nbByte		 = 0;
+							data[nbByte++] = ch;
+	                        fAuthorizeStart = false;
+					}
+					else if ((fStart)&&(ch == (BYTE)end_marker))
+					{
+						data[nbByte++] = ch;
+						fEnd = true;
+					}
+					else if (fStart)
+					{
+						data[nbByte++] = ch;
+					}
+
+				}
+				else
+				{
+					fOut = true;
+					//	_stprintf(szBuffer, __TEXT("%s : Disconnection by remote host"),
+					//	ProjectContractor::getNameByContractor(ConfigEther[index].idContractor));
+					//	Trace(szBuffer);
+				}
+			}
+			/**
+			else
+			{
+				fOut = true;
+			}
+			**/
+
+			if (fEnd)
+			{
+				*len = nbByte;
+				fOut = true;
+			}
+		}
+		while (!fOut);	//tmp by sam 20171006 -> 20171009
+
+		cerr << "ReceiveDataAFC function data:" << endl; 	//tmp by sam 20171006
+		//added by sam 20171009 for debugging
+		for(int i= 0; i < strlen(data); i++){
+			cerr << data[i];
+		}
+		cerr << endl;
+		//added by sam 20171009 for debugging
+
+		return (fEnd)?(nbByte):0;
+	}
+	//added by sam 20170929
 
 
 protected:
@@ -257,6 +405,35 @@ private:
 	std::string _userPasswordHash;
 	std::set<std::string> _userPermissions;
 	std::string _salt;
+
+	Poco::SharedPtr<Poco::Util::Timer> _pTimer;	//added by sam 20171004 for timer receiving PA messages
+
+	int AFC_LEN	= 4096; // Correction of the site bug 12/12/2003
+	typedef unsigned char BYTE;
+	typedef struct {
+
+		bool   isTerminate;                 // to stop the PP threads
+		BYTE   linkStatus;                  // link status : LINK_COM_OK or LINK_COM_HS
+		bool   isConnect;
+
+//	  	HANDLE hEventReceive;
+//	  	HANDLE hMutex;
+
+		// be carefull : use AFC_LEN instead of ETHER_LEN to define the greatest buffer
+		BYTE   receiveMsg[4096]; // reception
+		BYTE   sendMsg[4096];    // sending frame
+
+//	  	HANDLE  hThreadSend;
+//	  	HANDLE  hThreadReceive;
+
+//	  	socket  soc;
+//	  	SOCKET  socServer;
+//	  	struct  sockaddr_in remoteAddr;
+
+		// pointer to an object used by the contractor.
+		void*   object;
+
+	} sEtherProtocol;
 };
 
 

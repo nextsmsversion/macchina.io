@@ -64,6 +64,7 @@ public:
 	};
 	
 	SimulatedSensor(const Params& params, Poco::Util::Timer& timer, int tmpSockfrd);
+	SimulatedSensor(const Params& params, Poco::Util::Timer& timer, int tmpSockfrd, std::map<int,string> instantMsgMap);	//by sam 20170906
 		/// Creates a SimulatedSensor.
 		
 	~SimulatedSensor();
@@ -76,7 +77,7 @@ public:
 	static const std::string NAME;
 	static const std::string SYMBOLIC_NAME;
 
-protected:
+public:	//tmp by sam originally protected:
 	Poco::Any getValueChangedPeriod(const std::string&) const;
 	void setValueChangedPeriod(const std::string&, const Poco::Any& value);
 	Poco::Any getValueChangedDelta(const std::string&) const;
@@ -92,7 +93,7 @@ protected:
 	void setPhysicalQuantity(std::string value);
 	Poco::Any PaMessage(const std::string&) const;	//added by sam 20170619
 
-private:
+//by sam originally private:
 	double _value;
 	int _valueChangedPeriod;
 	double _valueChangedDelta;
