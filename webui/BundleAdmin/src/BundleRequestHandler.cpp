@@ -95,7 +95,10 @@ void BundleRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, 
 			response.setContentType("application/json");
 			std::ostream& ostr = response.send();
 
-			ostr << "paservice night mode :" << pPaService->getNightModeStatus() ;
+			ostr
+					<< "{"
+					<< "\"night\":" << pPaService->getNightModeStatus()
+					<< "}";
 			return;
 	}
 	//added by sam 20171010

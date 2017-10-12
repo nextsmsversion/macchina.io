@@ -62,6 +62,8 @@ public:
 /** by sam 20170807 originally
 	virtual std::string sendPaCommand(int nightMode) const = 0;*/
 	virtual std::string sendPaCommand(int nightMode, const std::string& schedTime, const std::string& zoneCode, const std::string& msgCode, const std::string& weekday ) const = 0;
+
+	virtual int getNightModeStatus() const = 0; //by sam 20171012
 	// Service
 	const std::type_info& type() const;
 	bool isA(const std::type_info& otherType) const;
@@ -69,6 +71,7 @@ public:
 	std::string getString(){ return "Inside PaService: URL PA "; };
 	std::string setNightMode(int nightMode){
 		return "Inside PaService: setNightMode OFF"; };
+
 };
 
 

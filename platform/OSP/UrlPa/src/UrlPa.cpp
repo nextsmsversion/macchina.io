@@ -160,15 +160,15 @@ public:
 
 
 		/***/
-		/** DONE <1> 201710091600 SMS 2.0 PA log (How to fix the real time during the time of FINISH)
-		*	TODO <2> append the data[] to mosquitto MQTT queue w.r.t. "update->updateCallback" in SMS source code
+		/** DONE <1> 201710091600	SMS 2.0 PA log ReceiveDataAFC
+		*	NONO <2> append the data[] to mosquitto MQTT queue w.r.t. "update->updateCallback" in SMS source code
 		*	0000NS00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030003100000010110000000000000000000031101111000000001120000000000010000000000000000000000000000000000000000000000@57
 		*	0000NS00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030003100000010110000000000000000000031101111000000001110000000000010000000000000000000000000000000000000000000000@58
-		*OR	TODO <2> bool SmsCmdMdlPaMgr::buildCommand			Notification CONFIGURATION CHANGED	0000NC000200@8D
-		*OR	TODO <2> void SmsPa::readStatus( RWCString status )	Notification STATUS CHANGED ABOVE
+		*OR	DONE <2> 201710121200	publish to REST API w.r.t. bool SmsCmdMdlPaMgr::buildCommand			Notification CONFIGURATION CHANGED	0000NC000200@8D
+		*OR	REFI <2> void SmsPa::readStatus( RWCString status )	Notification STATUS CHANGED ABOVE
 		*
 		*	TODO <3> check when there is update of PA, web client subscribe/WEBSOCKET the MQTT
-		*	TODO <4> or the web client polling
+		*OR	TODO <4> or the web client polling
 		***/
 		//201710071703
 		close(sockid);
@@ -177,7 +177,7 @@ public:
 	void setNightModeStatus(int tmpNightModeStatus){
 		nightModeStatus = tmpNightModeStatus;
 	}
-	int getNightModeStatus(){
+	int getNightModeStatus() const{
 		return nightModeStatus;
 	}
 	
