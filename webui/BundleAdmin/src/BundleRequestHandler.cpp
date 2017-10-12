@@ -22,6 +22,7 @@
 #include "Poco/NumberParser.h"
 #include "Utility.h"
 
+#include "Poco/OSP/Pa/PaService.h"	//by sam 20171010
 
 namespace IoT {
 namespace Web {
@@ -33,6 +34,13 @@ BundleRequestHandler::BundleRequestHandler(Poco::OSP::BundleContext::Ptr pContex
 {
 }
 
+/**
+ * TODO by sam to handle the request as follows:
+ * @link
+ * http://localhost:22080/macchina/bundles/bundle.json?symbolicName=com.appinf.osp.js.data
+ * @return
+ * {"id":1,"symbolicName":"com.appinf.osp.js.data","name":"OSP JavaScript Data Module","version":"1.0.0","state":"active","vendor":"Applied Informatics","copyright":"(c) 2016, Applied Informatics Software Engineering GmbH","runlevel":"600","path":"/Users/sms/nextsmsversion/macchina.smsv2/platform/OSP/bundles/com.appinf.osp.js.data_1.0.0.bndl","requires": [{"symbolicName":"com.appinf.osp.js","versions":"[1.0.0,2.0.0)"},{"symbolicName":"poco.data","versions":"[1.0.0,2.0.0)"}],"requiredBy": []}
+ */
 
 void BundleRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
 {
@@ -79,7 +87,19 @@ void BundleRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, 
 	{
 		pBundle = context()->findBundle(form.get("symbolicName"));
 	}
-		
+	//added by sam 20171010
+	else if (form.has("paservice")){
+		Poco::OSP::Auth::PaService::Ptr pPaService = Poco::OSP::ServiceFinder::findByName<Poco::OSP::Auth::PaService>(context(), "osp.urlpa");
+		context()->logger().information("TODO return response.send() from pPaService->ReceiveDataAFC()");
+		response.setChunkedTransferEncoding(true);
+			response.setContentType("application/json");
+			std::ostream& ostr = response.send();
+
+			ostr << "paservice night mode :" << pPaService->getNightModeStatus() ;
+			return;
+	}
+	//added by sam 20171010
+
 	if (!pBundle)
 	{
 		response.setContentLength(0);

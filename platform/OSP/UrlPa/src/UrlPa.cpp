@@ -22,6 +22,16 @@
 #include "Poco/MD5Engine.h"
 #include <set>
 
+//added by sam 20171010 START for adding push notification
+#include <algorithm>
+#include <stdexcept>
+#include <arpa/inet.h>
+#include <sstream>
+#include <iostream>
+#include <string.h>
+#include <unistd.h>
+//added by sam 20171010 FINISH
+
 
 //added by sam 20170522 for trying FTP START
 #include <Poco/Exception.h>
@@ -90,6 +100,7 @@ class UrlPaService: public Poco::OSP::Auth::PaService
 	/// specified as a comma-separated list.
 {
 public:
+
 	UrlPaService(const std::string& adminName, const std::string& adminPasswordHash, const std::string& userName, const std::string& userPasswordHash, const std::set<std::string>& userPermissions, const std::string& salt):
 		_adminName(adminName),
 		_adminPasswordHash(adminPasswordHash),
@@ -101,7 +112,7 @@ public:
 		cerr << "UrlPaService constructor begin" <<	endl;
 		_pTimer = new Poco::Util::Timer;			//added by sam 20171004 for timer receiving PA messages
 		//_pTimer->schedule(new Poco::Util::TimerTaskAdapter<UrlPaService>(*this, &UrlPaService::reconnect), Poco::Timestamp());
-		_pTimer->scheduleAtFixedRate(new Poco::Util::TimerTaskAdapter<UrlPaService>(*this, &UrlPaService::reconnect), 250, 5000);
+		_pTimer->scheduleAtFixedRate(new Poco::Util::TimerTaskAdapter<UrlPaService>(*this, &UrlPaService::reconnect), 250, 1000);
 		cerr << "UrlPaService constructor finish" <<	endl;
 	}
 	
@@ -120,7 +131,7 @@ public:
 		int len = 0;
 		int timeout = 0;
 
-		//sEtherProtocol etherProtocol;	TODO use struct or not
+		//sEtherProtocol etherProtocol;
 		BYTE   receiveMsg[4096]; // reception
 		/***/
 		int sockid = connectSocket();
@@ -132,25 +143,42 @@ public:
 							timeout,
 							'\n' //AFC_MESSAGE_END,
 							);
-		//cerr << receiveMsg << endl;
+
+
+		//TODO <2>	void SmsPa::readStatus( RWCString status ) put the following into function
+		//following is just a case, needs to be generalize and write re-usable function like SmsPa::readStatus
+		setNightModeStatus(((int)receiveMsg[199+5])-48);	//ASCII code : start from 48
+		if( getNightModeStatus() == 2){
+			cerr << "night mode is ON "<<endl;
+		}else if(getNightModeStatus() == 1){		//ASCII code : start from 48
+			cerr << "night mode is OFF " <<endl;
+		}else{
+			cerr << "night mode is UNKNOWN "<<endl;
+		}
+
+		//TODO <3> check when there is update of PA, web client subscribe/WEBSOCKET the MQTT
+
+
 		/***/
-		/**TODO <1>	calling the following to receive PA message and output to data
-		*  int ReceiveDataAFC (
-		*	int index,
-		*	int soc,
-		*	char data[],
-		*	int *len,
-		*	int timeOut,
-		*	char end_marker,
-		*	bool start_marked,
-		*	char start_marker)
+		/** DONE <1> 201710091600 SMS 2.0 PA log (How to fix the real time during the time of FINISH)
+		*	TODO <2> append the data[] to mosquitto MQTT queue w.r.t. "update->updateCallback" in SMS source code
+		*	0000NS00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030003100000010110000000000000000000031101111000000001120000000000010000000000000000000000000000000000000000000000@57
+		*	0000NS00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030003100000010110000000000000000000031101111000000001110000000000010000000000000000000000000000000000000000000000@58
+		*OR	TODO <2> bool SmsCmdMdlPaMgr::buildCommand			Notification CONFIGURATION CHANGED	0000NC000200@8D
+		*OR	TODO <2> void SmsPa::readStatus( RWCString status )	Notification STATUS CHANGED ABOVE
 		*
-		*	TODO <2> append the data[] to MQTT queue
-		*	TODO <3> check when there is update of PA, WEBSOCKET the web client
+		*	TODO <3> check when there is update of PA, web client subscribe/WEBSOCKET the MQTT
 		*	TODO <4> or the web client polling
 		***/
-
+		//201710071703
+		close(sockid);
 		cerr << "UrlPaService reconnect finish" <<	endl;
+	}
+	void setNightModeStatus(int tmpNightModeStatus){
+		nightModeStatus = tmpNightModeStatus;
+	}
+	int getNightModeStatus(){
+		return nightModeStatus;
 	}
 	
 	// AuthService
@@ -288,7 +316,8 @@ public:
 
 
 		send(_sockfd, paMsg, sizeof(paMsg), 0);
-		//20171003	close(_sockfd);			//by sam comment if this is closed, client list of PA will not store duplicate entries
+		//201710071702
+		close(_sockfd);			//by sam comment if this is closed, client list of PA will not store duplicate entries
 
 	}
 	//added by sam 20170703 for adding socket to connect to PA server FINISH
@@ -376,18 +405,22 @@ public:
 		}
 		while (!fOut);	//tmp by sam 20171006 -> 20171009
 
-		cerr << "ReceiveDataAFC function data:" << endl; 	//tmp by sam 20171006
-		//added by sam 20171009 for debugging
-		for(int i= 0; i < strlen(data); i++){
-			cerr << data[i];
+//by sam 20171010 START
+		if (_pContext->logger().information())	//by sam 20170623 request from extensions.xml -> BundleActionsRequestHandlerFactory
+		{
+			_pContext->logger().information("ReceiveDataAFC function data:"); //by sam
+			//string paMsg(data);
+			_pContext->logger().information(data);
 		}
-		cerr << endl;
+//by sam 20171010 FINISH
+
 		//added by sam 20171009 for debugging
 
 		return (fEnd)?(nbByte):0;
 	}
 	//added by sam 20170929
 
+	BundleContext::Ptr _pContext;//by sam 20171010
 
 protected:
 	std::string hashCredentials(const std::string& credentials) const
@@ -399,6 +432,8 @@ protected:
 	}
 
 private:
+
+
 	std::string _adminName;
 	std::string _adminPasswordHash;
 	std::string _userName;
@@ -434,6 +469,8 @@ private:
 		void*   object;
 
 	} sEtherProtocol;
+
+	int nightModeStatus;
 };
 
 
@@ -469,7 +506,9 @@ public:
 		}
 		
 		AutoPtr<UrlPaService> pService = new UrlPaService(adminName, adminPasswordHash, userName, userPasswordHash, userPermissions, salt);
+		pService->_pContext = pContext;	//by sam 20171010
 		_pService = pContext->registry().registerService("osp.urlpa", pService, Properties());
+
 	}
 		
 	void stop(BundleContext::Ptr pContext)
