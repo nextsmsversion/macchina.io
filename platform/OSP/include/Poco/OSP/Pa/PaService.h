@@ -63,7 +63,7 @@ public:
 	virtual std::string sendPaCommand(int nightMode) const = 0;*/
 	virtual std::string sendPaCommand(int nightMode, const std::string& schedTime, const std::string& zoneCode, const std::string& msgCode, const std::string& weekday ) const = 0;
 
-	virtual int getNightModeStatus() const = 0; //by sam 20171012
+	virtual std::string getPaStatusJson() const = 0; //by sam 20171012
 	// Service
 	const std::type_info& type() const;
 	bool isA(const std::type_info& otherType) const;

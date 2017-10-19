@@ -147,16 +147,12 @@ public:
 
 		//TODO <2>	void SmsPa::readStatus( RWCString status ) put the following into function
 		//following is just a case, needs to be generalize and write re-usable function like SmsPa::readStatus
-		setNightModeStatus(((int)receiveMsg[199+5])-48);	//ASCII code : start from 48
-		if( getNightModeStatus() == 2){
-			cerr << "night mode is ON "<<endl;
-		}else if(getNightModeStatus() == 1){		//ASCII code : start from 48
-			cerr << "night mode is OFF " <<endl;
-		}else{
-			cerr << "night mode is UNKNOWN "<<endl;
-		}
+		//TODO return "{\"night\":1}"
+		cerr << "receiveMsg string: " << receiveMsg[199+5] << endl;
+		setNightModeValue(((int)receiveMsg[199+5])-48);	//ASCII code : start from 48
 
 		//TODO <3> check when there is update of PA, web client subscribe/WEBSOCKET the MQTT
+		//OR	TODO <4> or the web client polling
 
 
 		/***/
@@ -166,21 +162,120 @@ public:
 		*	0000NS00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030003100000010110000000000000000000031101111000000001110000000000010000000000000000000000000000000000000000000000@58
 		*OR	DONE <2> 201710121200	publish to REST API w.r.t. bool SmsCmdMdlPaMgr::buildCommand			Notification CONFIGURATION CHANGED	0000NC000200@8D
 		*OR	REFI <2> void SmsPa::readStatus( RWCString status )	Notification STATUS CHANGED ABOVE
-		*
+		*	TODO <2> display of the courtesy message by decode message of the database.txt w.r.t. bool SmsFilePaMgr::ReadMsgConfig( const char *fileName ) @updatePA
 		*	TODO <3> check when there is update of PA, web client subscribe/WEBSOCKET the MQTT
 		*OR	TODO <4> or the web client polling
+		*	TODO <5> in case of status for updating configuration file database.txt, instant.txt
+		*	TODO <6> FTP and read the above configuration file w.r.t. SmsFilePaMgr::ReadMsgConfig( const char *fileName )
 		***/
+		if(true){ //TODO <5> in case of status receiveMsg[??] for updating configuration file
+			string localfilename = "/Users/sms/aDatabase.txt", remotefilename = "PAServer/config/database.txt";
+			getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.109.246");
+
+//TODO by sam to generalize the following as functions
+
+//#define PA_SECTION_MSG_TYPE
+//#define PA_SECTION_MSG_VAR
+//#define PA_SECTION_PREDEF_MSG
+
+#ifdef PA_SECTION_MSG_TYPE
+			string line	= "07	Courtesy";								//PA_SECTION_MSG_TYPE
+#endif
+#ifdef PA_SECTION_MSG_VAR
+			string line 	= "#03     01E	this";								//PA_SECTION_MSG_VAR
+#endif
+#ifdef PA_SECTION_PREDEF_MSG
+			string line 	= "Last    01.2E #03	is the last train for";	//PA_SECTION_PREDEF_MSG	: msgWithVarEndLineFormat
+#endif
+
+
+			//TODO	SmsUpdatePa::Get()->getParameters()->getMsgTypeLineFormat() ;
+#ifdef PA_SECTION_MSG_TYPE
+			string format = "%2d%*1[	]%200c";				//PA_SECTION_MSG_TYPE
+#endif
+#ifdef PA_SECTION_MSG_VAR
+			/** by sam originally
+			string format	= "%8c%2d%[CE]%*1[	]%200c";		//PA_SECTION_MSG_VAR	: msgWithoutVarLineFormat **/
+			string format	= "#%2d%*1[     ]%2d%[CE]%*1[	]%200c";		//PA_SECTION_MSG_VAR	: msgWithoutVarLineFormat
+#endif
+#ifdef PA_SECTION_PREDEF_MSG
+			string format 	= "%8c%2d.%1d%[CE]%*1[ ]#%2d%*1[	]%200c";	//PA_SECTION_PREDEF_MSG	: msgWithVarLineFormat
+#endif
+
+
+#ifdef PA_SECTION_MSG_TYPE
+			//PA_SECTION_MSG_TYPE
+			int msgTypeId = 0;
+			char msgTypeName[256] ;
+			memset( msgTypeName, 0, sizeof( msgTypeName ) ) ;
+#endif
+#ifdef PA_SECTION_MSG_VAR
+			//PA_SECTION_MSG_VAR
+			int varTypeId = 0 ;
+			int varId = 0 ;
+			char chineseOrEnglish[256] ;
+			memset( chineseOrEnglish, 0, sizeof( chineseOrEnglish ) ) ;
+			char varText[256] ;
+			memset( varText, 0, sizeof( varText ) ) ;
+#endif
+#ifdef PA_SECTION_PREDEF_MSG
+			//PA_SECTION_PREDEF_MSG	: msgWithVarEndLineFormat
+			char msgType[256] ;
+			memset( msgType, 0, sizeof( msgType ) ) ;
+			int msgId = 0 ;
+			int msgPart = 0 ;
+			char chineseOrEnglish[256] ;
+			memset( chineseOrEnglish, 0, sizeof( chineseOrEnglish ) ) ;
+			int varType = 0 ;
+			char msgText[256] ;
+			memset( msgText, 0, sizeof( msgText ) ) ;
+#endif
+
+
+			// Analyse line as message type line	by int sscanf ( const char * s, const char * format, ...);
+#ifdef PA_SECTION_MSG_TYPE
+			int returnValue = sscanf(line.c_str(), format.c_str(), &msgTypeId, msgTypeName);						//PA_SECTION_MSG_TYPE
+#endif
+#ifdef PA_SECTION_MSG_VAR
+			int returnValue = sscanf( line.data(), format.data(), &varTypeId, &varId, chineseOrEnglish, varText );	//PA_SECTION_MSG_VAR
+#endif
+#ifdef PA_SECTION_PREDEF_MSG
+			int returnValue = sscanf( line.data(), format.data(), msgType, &msgId, &msgPart, chineseOrEnglish, &varType, msgText );
+#endif
+
+			cerr << line << endl;
+#ifdef PA_SECTION_MSG_TYPE
+			printf("%s -> %d return %d\n", msgTypeName, msgTypeId, returnValue);	//PA_SECTION_MSG_TYPE
+#endif
+#ifdef PA_SECTION_MSG_VAR
+			printf("%d, %d, %s, %s return %d\n", varTypeId, varId, chineseOrEnglish, varText, returnValue);	//PA_SECTION_MSG_VAR
+#endif
+#ifdef PA_SECTION_PREDEF_MSG
+			printf("%s, %d, %d, %s, %d: <%s> return %d\n", msgType, &msgId, &msgPart, chineseOrEnglish, varType, msgText, returnValue);	//PA_SECTION_MSG_VAR
+#endif
+//TODO by sam to generalize the following as functions
+
+		}
+
 		//201710071703
 		close(sockid);
 		cerr << "UrlPaService reconnect finish" <<	endl;
 	}
-	void setNightModeStatus(int tmpNightModeStatus){
-		nightModeStatus = tmpNightModeStatus;
-	}
-	int getNightModeStatus() const{
-		return nightModeStatus;
-	}
 	
+	void setNightModeValue(int tmpNightModeStatus){
+		std::stringstream ss;
+		ss << tmpNightModeStatus;
+		nightModeValue = ss.str();
+	}
+	//TODO change to this function
+	std::string getPaStatusJson() const{
+		char jsonStr[80];
+		std::strcpy(jsonStr, "{\"night\":");	//"{\"night\":1}"
+		std::strcat(jsonStr, nightModeValue.c_str());
+		std::strcat(jsonStr, "}");
+		return jsonStr;
+	}
+
 	// AuthService
 	bool authenticate(const std::string& userName, const std::string& credentials) const
 	{
@@ -420,6 +515,46 @@ public:
 	}
 	//added by sam 20170929
 
+	//added by sam 20171019 START
+
+	/*** getFile -> SmsUpdatePa::ThreadUpdateFtp //COPY from remote to local file path
+	 * reference from
+	 * https://git.sch.bme.hu/kk1205/raspberrycloud/blob/cachemeres/program/Source/cloud/FTPAdapter.cpp
+	 * @param	string localfilename	"/Users/sms/a.txt",
+	 * 			string remotefilename	"a.txt"
+	 * 			string USERNAME 		"ftpuser";
+	 * 			string PASSWORD 		"ftp123456";
+	 * 			string HOST 			"128.13.109.246";
+	 */
+		bool getFile(	string localfilename, string remotefilename,
+						string USERNAME, string PASSWORD, string HOST){
+			//cerr << "LOG: Inside LinearUpdateTimerTask getFile"  << endl;
+			//added by sam 20170518 for establishing FTP session START
+			FTPClientSession session(HOST, FTPClientSession::FTP_PORT, USERNAME, PASSWORD);
+			Path localFilePath(localfilename);
+			ofstream file(localFilePath.toString(), ios::out | ios::binary);	//TODO by sam to set to ASCII??
+			//added by sam 20170518 for establishing FTP session FINISH
+
+			//added by sam 20170522 for trying FTP downloading file to local file START
+			try {
+					session.setFileType(FTPClientSession::TYPE_BINARY);
+					auto& is = session.beginDownload(remotefilename);
+					StreamCopier::copyStream(is, file);
+					//session.endDownload();	//TODO throw exception??
+			}
+			catch (FTPException& e) {
+				cerr << "20170822 debug error: " << e.message() << endl;
+				//under the case the PA server is not existing/up
+				return false;
+			}
+			return true;
+			//added by sam 20170522 for trying FTP downloading file to local file FINISH
+		}
+
+
+	//added by sam 20171019 FINISH
+
+
 	BundleContext::Ptr _pContext;//by sam 20171010
 
 protected:
@@ -432,7 +567,7 @@ protected:
 	}
 
 private:
-
+	std::string nightModeValue;	//by sam 20171013
 
 	std::string _adminName;
 	std::string _adminPasswordHash;
@@ -470,7 +605,6 @@ private:
 
 	} sEtherProtocol;
 
-	int nightModeStatus;
 };
 
 

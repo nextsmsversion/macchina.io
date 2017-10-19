@@ -232,7 +232,8 @@ as long as the bullet point is removed, this can be put back
                                     <!-- 20170529 by sam FINISH originally  <div ng-controller="DevicesCtrl" class="groupbox"> -->
                                     <button ng-click="sendPaMessage(states.activeItem)" type="button" class="bg-success" style="color: #9d9696;background-color: #b7abab;width: 80px;height: 40px;font-size: 12px;font-weight: bold;">RECORD</button>
                                     <button ng-click="sendPaMessage(states.activeItem)" type="button" class="bg-success" style="color: #9d9696;background-color: #b7abab;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;font-weight: bold;">DELETE</button>
-                                    <button ng-click="sendPaMessage(states.activeItem)" type="button" style="color: #0c0101;background-color: #b7abab;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;font-weight: bold;" class="bg-info">Night</button>
+                                    <!-- by sam 20171012 to reflect night mode status & TODO change to other function: ng-click="sendPaMessage(states.activeItem)" -->
+                                    <button  id="nightmodebtn" type="button" style="color: #0c0101;background-color:{{nightmodebtnColor}};width: 80px;height: 40px;font-size: 12px;margin-top: 8px;font-weight: bold;" class="bg-info">{{nightBtnTxt}}</button>
                                     <button type="button" href="#tab-2" class="btnAddSche" style="color: #9d9696;background-color: #b7abab;width: 80px;height: 40px;font-size: 12px;margin-top: 8px;font-weight: bold;">Add Sche.</button>
                                     <!-- tmp by sam 
                                     <ul class="tabs-menu" style="width: 10px;height: 5px; margin-left: 20px;padding-left: 1px;bottom: 100px;margin-bottom: -100px">

@@ -90,11 +90,32 @@ devicesControllers.controller('DevicesCtrl', ['$scope', '$http', '$interval','De
       }
     
     $interval(function() {
-    console.log("frequent update of the status");
-      $http.get('/macchina/devices/devices.jss').success(function(data) {
-        $scope.devices = data;
-      })
+    	console.log("frequent update of the status");
+    	
+    	$http.get('/macchina/bundles/bundle.json?paservice=yes' ).success(
+            function(data) {
+            	//alert(data.night);
+
+        		$scope.nightBtnTxt = "Undefined";
+        		$scope.nightmodebtnColor = "#b7abab";
+            	if(data.night==2){
+            		$scope.nightBtnTxt = "Night On";	//change color: #0c0101
+            		$scope.nightmodebtnColor = "#ffffff";
+            	}else{
+            		$scope.nightBtnTxt = "Night Off";  
+            		$scope.nightmodebtnColor = "#ff0000";
+            	}
+            }
+    	);
+      
+      $http.get('/macchina/devices/devices.jss').success(
+    		  function(data) {
+    			  $scope.devices = data;
+    		  }
+      ); 
+      
     }, 1000);	//tmp by sam 20170906 from 10 seconds to 1 second
+    
   }]);
 
 devicesControllers.controller('SessionCtrl', ['$scope', '$http',
