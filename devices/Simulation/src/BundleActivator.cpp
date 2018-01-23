@@ -103,7 +103,7 @@ public:
 				cerr << "PaUpdateTimerTask::up running .." <<endl;
 				string localfilename = "/Users/sms/a.txt", remotefilename = "PAServer/config/instant.txt";
 				try{
-					if(getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.109.246")){ //tmp by sam 201707130845
+					if(getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.22.246")){ //tmp by sam 201707130845
 						//connection is alright -> do nothing
 					}else{
 						//tmp by sam	_instantMsgMap.clear();	//by sam 20170822 trial
@@ -125,7 +125,7 @@ public:
  * 			string remotefilename	"a.txt"
  * 			string USERNAME 		"ftpuser";
  * 			string PASSWORD 		"ftp123456";
- * 			string HOST 			"128.13.109.246";
+ * 			string HOST 			"128.13.22.246";
  */
 	bool getFile(	string localfilename, string remotefilename,
 					string USERNAME, string PASSWORD, string HOST){
@@ -177,7 +177,11 @@ public:
 		ServerHelper::RemoteObjectPtr pSensorRemoteObject = ServerHelper::createRemoteObject(pSensor, params.id);
 		
 		Properties props;
-		props.set("io.macchina.device", SimulatedSensor::SYMBOLIC_NAME);
+		/** TODO instant message from 8 to 100 **/
+		/**20180122 originally
+		props.set("io.macchina.device", SimulatedSensor::SYMBOLIC_NAME);**/
+		props.set("io.macchina.instancemsg", SimulatedSensor::SYMBOLIC_NAME);
+		//
 		if (!params.physicalQuantity.empty())
 		{
 			props.set("io.macchina.physicalQuantity", params.physicalQuantity);
@@ -218,7 +222,7 @@ public:
 		bzero(&dest, sizeof(dest));
 		dest.sin_family = AF_INET;
 		dest.sin_port = htons(1100);
-		dest.sin_addr.s_addr = inet_addr("128.13.109.246");
+		dest.sin_addr.s_addr = inet_addr("128.13.22.246");
 
 		/**connecting to server**/
 		int result = connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
@@ -264,7 +268,7 @@ public:
 		string localfilename = "/Users/sms/a.txt", remotefilename = "PAServer/config/instant.txt";
 		//if(connectSocket() == true)
 		{ //by sam 20170822 when PA server is valid
-		//	getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.109.246"); //tmp by sam 201707130845 //TODO *** solve the problem if the FTP is not ON
+		//	getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.22.246"); //tmp by sam 201707130845 //TODO *** solve the problem if the FTP is not ON
 		//	loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
 		}
 		//added by sam 20170525 to get the PA mesages through FTP FINISH
@@ -273,7 +277,7 @@ public:
 		//bool testingPAserverIsUp = connectSocket();	//testing if PA server is up
 
 			///added by sam 20170524 for setting timer to update the PA from FTP START
-			for(int i=1; i< 9 ;i++ )	//added by sam 20170529
+			for(int i=1; i< 100 ;i++ )	//added by sam 20170529 20180123 from 8 to 100
 			{
 				std::string baseKey = "PA.instantMessage.";
 				SimulatedSensor::Params params;
@@ -357,7 +361,7 @@ public:
 	 * 			string remotefilename	"a.txt"
 	 * 			string USERNAME 		"ftpuser";
 	 * 			string PASSWORD 		"ftp123456";
-	 * 			string HOST 			"128.13.109.246";
+	 * 			string HOST 			"128.13.22.246";
 	 */
 	void getFile(	string localfilename, string remotefilename,
 						string USERNAME, string PASSWORD, string HOST){

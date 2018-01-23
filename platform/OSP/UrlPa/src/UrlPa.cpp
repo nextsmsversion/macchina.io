@@ -121,7 +121,16 @@ public:
 	{
 	}
 
-
+/**
+ * Function
+ * 	@name: 	reconnect(Poco::Util::TimerTask&)
+ * 	@usage:	update at a fixed rate in the thread, i.e. UrlPaService::reconnect
+ *	@call:	ReceiveDataAFC		:	get the status update from PA server through string : 0000NS000000000000000000000000000000000000xxxx
+ *	@call:	setNightModeValue	:	update the status of PA night mode to the MMI
+ *	@call: 	getFile				:	FTP the latest PA text file: instant.txt, database.txt
+ *	@TODO :		-instant message: 	"props.set"
+ *	@step:	decoding the file and get the message (1. instant.txt	2. database.txt [PA_SECTION_PREDEF_MSG])
+ * */
 	void reconnect(Poco::Util::TimerTask&)
 	{
 		cerr << "UrlPaService reconnect start" <<	endl;
@@ -167,25 +176,33 @@ public:
 		*OR	TODO <4> or the web client polling
 		*	TODO <5> in case of status for updating configuration file database.txt, instant.txt
 		*	TODO <6> FTP and read the above configuration file w.r.t. SmsFilePaMgr::ReadMsgConfig( const char *fileName )
+		*	TODO <6> Store the message w.r.t. SmsPa::endMsgTypeConfig()		:	list.insert( msgType ) ;
+		*	TODO <7> how to display in the MMI	:	w.r.t. SmsPanelPa::editSelectorCB	//instant messages editor
+		*
 		***/
 		if(true){ //TODO <5> in case of status receiveMsg[??] for updating configuration file
 			string localfilename = "/Users/sms/aDatabase.txt", remotefilename = "PAServer/config/database.txt";
-			getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.109.246");
+			getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.22.246");
 
 //TODO by sam to generalize the following as functions
 
 //#define PA_SECTION_MSG_TYPE
 //#define PA_SECTION_MSG_VAR
-//#define PA_SECTION_PREDEF_MSG
+#define PA_SECTION_PREDEF_MSG
 
 #ifdef PA_SECTION_MSG_TYPE
-			string line	= "07	Courtesy";								//PA_SECTION_MSG_TYPE
+			/**
+			string line	= "07	Courtesy";	**/							//PA_SECTION_MSG_TYPE	SmsPa::msgTypeCreation
+			string line = "09	Crowd";
 #endif
 #ifdef PA_SECTION_MSG_VAR
-			string line 	= "#03     01E	this";								//PA_SECTION_MSG_VAR
+			string line 	= "#03     01E	this";						//PA_SECTION_MSG_VAR
 #endif
 #ifdef PA_SECTION_PREDEF_MSG
-			string line 	= "Last    01.2E #03	is the last train for";	//PA_SECTION_PREDEF_MSG	: msgWithVarEndLineFormat
+			/**
+			string line 	= "Last    01.2E #03	is the last train for";	//PA_SECTION_PREDEF_MSG	: 	SmsPa::predefMsgPartCreation
+			string line 	= "Service 05.1E #03	Reduced service due to incident at a station: Your attention please, Train service to";	**/
+			string line		= "Crowd   02.1E #14	No blocking in concourse or on platform: Your attention please, Please do not wait";
 #endif
 
 
@@ -200,6 +217,8 @@ public:
 #endif
 #ifdef PA_SECTION_PREDEF_MSG
 			string format 	= "%8c%2d.%1d%[CE]%*1[ ]#%2d%*1[	]%200c";	//PA_SECTION_PREDEF_MSG	: msgWithVarLineFormat
+			/**
+			string format 	= "%8c%2d.%1d%[CE]%*1[	]%200c"; 				//						: msgWithVarEndLineFormat**/
 #endif
 
 
@@ -230,8 +249,6 @@ public:
 			char msgText[256] ;
 			memset( msgText, 0, sizeof( msgText ) ) ;
 #endif
-
-
 			// Analyse line as message type line	by int sscanf ( const char * s, const char * format, ...);
 #ifdef PA_SECTION_MSG_TYPE
 			int returnValue = sscanf(line.c_str(), format.c_str(), &msgTypeId, msgTypeName);						//PA_SECTION_MSG_TYPE
@@ -251,7 +268,7 @@ public:
 			printf("%d, %d, %s, %s return %d\n", varTypeId, varId, chineseOrEnglish, varText, returnValue);	//PA_SECTION_MSG_VAR
 #endif
 #ifdef PA_SECTION_PREDEF_MSG
-			printf("%s, %d, %d, %s, %d: <%s> return %d\n", msgType, &msgId, &msgPart, chineseOrEnglish, varType, msgText, returnValue);	//PA_SECTION_MSG_VAR
+			printf("%s, %d, %d, %s, %d: <%s> return %d\n", msgType, msgId, msgPart, chineseOrEnglish, varType, msgText, returnValue);	//PA_SECTION_MSG_VAR
 #endif
 //TODO by sam to generalize the following as functions
 
@@ -327,7 +344,7 @@ public:
 		bzero(&dest, sizeof(dest));
 		dest.sin_family = AF_INET;
 		dest.sin_port = htons(1100);
-		dest.sin_addr.s_addr = inet_addr("128.13.109.246");//TODO by sam to get from parameter file
+		dest.sin_addr.s_addr = inet_addr("128.13.22.246");//TODO by sam to get from parameter file
 
 		/**connecting to server**/
 		connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
@@ -524,7 +541,7 @@ public:
 	 * 			string remotefilename	"a.txt"
 	 * 			string USERNAME 		"ftpuser";
 	 * 			string PASSWORD 		"ftp123456";
-	 * 			string HOST 			"128.13.109.246";
+	 * 			string HOST 			"128.13.22.246";
 	 */
 		bool getFile(	string localfilename, string remotefilename,
 						string USERNAME, string PASSWORD, string HOST){

@@ -96,7 +96,7 @@ public:
 		{
 			string localfilename = "/Users/sms/a.txt", remotefilename = "PAServer/config/instant.txt";
 			try{
-				if(getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.109.246")){ //tmp by sam 201707130845
+				if(getFile(localfilename, remotefilename, "anonymous", "sms", "128.13.22.246")){ //tmp by sam 201707130845
 					loadFile("/Users/sms/a.txt");	//added by sam 20170523 filestream START
 				}
 			}
@@ -150,7 +150,7 @@ public:
 	2017-08-25 01:19:07.882 [Notice] Application<22>: A thread was terminated by an unhandled exception: I/O error: Too many open files
 	2017-08-25 01:19:07.884 [Notice] Application<22>: A thread was terminated by an unhandled exception: I/O error: Too many open files
 
-	2017-08-29 02:48:45.292 [Notice] Application<25>: A thread was terminated by an unhandled exception: Net Exception: Host is down: 128.13.109.246:21
+	2017-08-29 02:48:45.292 [Notice] Application<25>: A thread was terminated by an unhandled exception: Net Exception: Host is down: 128.13.22.246:21
 	**/
 
 	int testPAconnectionSock = 0;	//by sam 20170825 to move out of scope
@@ -222,7 +222,7 @@ public:
  * 			string remotefilename	"a.txt"
  * 			string USERNAME 		"ftpuser";
  * 			string PASSWORD 		"ftp123456";
- * 			string HOST 			"128.13.109.246";
+ * 			string HOST 			"128.13.22.246";
  */
 	bool getFile(	string localfilename, string remotefilename,
 					string USERNAME, string PASSWORD, string HOST){

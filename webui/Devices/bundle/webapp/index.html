@@ -2,8 +2,36 @@
 <!-- 20170710 by sam to add a tab layout  
 as long as the bullet point is removed, this can be put back 
 
+Scrollbar table 
+http://jsfiddle.net/TweNm/
+TODO: fixed header
+http://jsfiddle.net/doctorDestructo/x54uraaq/
 -->
 <style>
+	#table-wrapper {
+	  position:relative;
+	}
+	#table-scroll {
+	  height:300px;
+	  overflow:auto;  
+	  margin-top:20px;
+	}
+	#table-wrapper table {
+	  width:100%;
+	    
+	}
+	#table-wrapper table * {
+	  color:black;
+	}
+	#table-wrapper table thead th .text {
+	  position:absolute;   
+	  top:-20px;
+	  z-index:2;
+	  height:20px;
+	  width:35%;
+	  border:1px solid red;
+	}
+
     body, .pg-file-cs-19, .pg-file-cs-25, .pg-file-cs-76, .pg-file-cs-79, .pg-file-cs-82, .pg-file-cs-103, .pg-file-cs-106, .pg-file-cs-112, .pg-file-cs-115, .pg-file-cs-21, .pg-file-cs-21, .pg-file-cs-21, .pg-file-cs-21, .pg-file-cs-21, .pg-file-cs-33, .pg-file-cs-37, .pg-file-cs-9, .pg-file-cs-1, .pg-file-cs-45, .pg-file-cs-1, .pg-file-cs-1 {
     padding: 20px; 
     font-family: Arial, Helvetica, sans-serif;
@@ -83,7 +111,8 @@ as long as the bullet point is removed, this can be put back
     background-color : #10c9bc;
     }
 </style>
-<script type="text/javascript" src="/jquery/jquery.min.js"></script>
+<!--  //added by sam 20170529 20180123 from 8 to 100 -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
 <script type="text/javascript">
 
 	$(document).ready(function() {
@@ -201,31 +230,35 @@ as long as the bullet point is removed, this can be put back
                                         <label class="control-label" style="margin-left: 5px">Msg Code: </label>
                                         <input id="txtTab1MsgCode" disabled="disabled" type="text" class="form-control" placeholder="#10.__.__.__.__.__.__.__.__.__.__.__.__.__" style="margin-left: 4px;width: 160px">
                                     </div>
-                                    <div class="groupbox">
-                                        <table class="list" style="width: 100%;padding-right: -6px">
-                                            <thead>
-                                                <tr>
-                                                    <!-- 20170529 by sam  <th ng-click="setOrderBy('name')" class="list-sortable">Name</th>  -->
-                                                    <!-- 20170529 by sam  <th ng-click="setOrderBy('symbolicName')" class="list-sortable">Message Type</th> -->
-                                                    <th ng-click="setOrderBy('id')" class="list-sortable">ID</th>
-                                                    <th ng-click="setOrderBy('physicalQuantity')" class="list-sortable">Message Name</th>
-                                                    <!-- 20170529 by sam  <th>State/Value</th>	-->
-                                                    <!-- 20170529 by sam  <th>TODO sentPaMessage()</th> -->
-                                                </tr>
-                                            </thead>                                             
-                                            <tbody class="selection">
-                                                <tr ng-repeat="device in devices | orderBy:orderBy track by $index" class="device" ng-class="{'active': device.id == states.activeItem}" ng-click="states.activeItem=device.id;setMsgIDTxt(states.activeItem);" ng-class-even="'even'" ng-class-odd="'odd'">
-                                                    <!-- 20170529 by sam <td>{{device.name}}</td> -->
-                                                    <!-- 20170529 by sam   <td>{{device.symbolicName}}</td> -->
-                                                    <td>{{device.id | number }}</td>
-                                                    <td>{{device.physicalQuantity}}</td>
-                                                    <!-- 20170529 by sam  <td>{{device.displayValue}}</td> -->
-                                                    <!-- 20170529 by sam  <td>{{device.PaMessage}}</td>	 -->
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <!-- 20170607 by sam  TODO trigger an action in C++ by addMethodHandler -->
-                                    </div>
+                                    <div id="table-wrapper">
+  									<div id="table-scroll">
+	                                    <div class="groupbox">
+	                                        <table id="tblData" class="list" style="width: 100%;padding-right: -6px">
+	                                            <thead>
+	                                                <tr>
+	                                                    <!-- 20170529 by sam  <th ng-click="setOrderBy('name')" class="list-sortable">Name</th>  -->
+	                                                    <!-- 20170529 by sam  <th ng-click="setOrderBy('symbolicName')" class="list-sortable">Message Type</th> -->
+	                                                    <th ng-click="setOrderBy('id')" class="list-sortable">ID</th>
+	                                                    <th ng-click="setOrderBy('physicalQuantity')" class="list-sortable">Message Name</th>
+	                                                    <!-- 20170529 by sam  <th>State/Value</th>	-->
+	                                                    <!-- 20170529 by sam  <th>TODO sentPaMessage()</th> -->
+	                                                </tr>
+	                                            </thead>                                             
+	                                            <tbody class="selection">
+	                                                <tr ng-repeat="device in devices | orderBy:orderBy track by $index" class="device" ng-class="{'active': device.id == states.activeItem}" ng-click="states.activeItem=device.id;setMsgIDTxt(states.activeItem);" ng-class-even="'even'" ng-class-odd="'odd'">
+	                                                    <!-- 20170529 by sam <td>{{device.name}}</td> -->
+	                                                    <!-- 20170529 by sam   <td>{{device.symbolicName}}</td> -->
+	                                                    <td>{{device.id | number }}</td>
+	                                                    <td>{{device.physicalQuantity}}</td>
+	                                                    <!-- 20170529 by sam  <td>{{device.displayValue}}</td> -->
+	                                                    <!-- 20170529 by sam  <td>{{device.PaMessage}}</td>	 -->
+	                                                </tr>
+	                                            </tbody>
+	                                        </table>
+	                                        <!-- 20170607 by sam  TODO trigger an action in C++ by addMethodHandler -->
+	                                    </div>
+	                                  </div>
+	                                  </div>
                                 </li>
                                 <li style="width: 5%;margin-left: 520px;margin-top: -260px"> 
                                     <!-- 20170712 -->
@@ -270,31 +303,35 @@ as long as the bullet point is removed, this can be put back
                                         <label class="control-label" style="margin-left: 4px">Description: </label>
                                         <input type="text" class="form-control" placeholder="comment" style="margin-left: 4px;width: 50px">
                                     </div>
-                                    <div class="groupbox">
-                                        <table class="list" style="width: 100%;padding-right: -6px">
-                                            <thead>
-                                                <tr>
-                                                    <!-- 20170529 by sam  <th ng-click="setOrderBy('name')" class="list-sortable">Name</th>  -->
-                                                    <!-- 20170529 by sam  <th ng-click="setOrderBy('symbolicName')" class="list-sortable">Message Type</th> -->
-                                                    <th ng-click="setOrderBy('id')" class="list-sortable">TIME</th>
-                                                    <th ng-click="setOrderBy('physicalQuantity')" class="list-sortable">Message ID</th>
-                                                    <!-- 20170529 by sam  <th>State/Value</th>	-->
-                                                    <!-- 20170529 by sam  <th>TODO sentPaMessage()</th> -->
-                                                </tr>
-                                            </thead>                                             
-                                            <tbody class="selection">
-                                                <tr ng-repeat="device in devices | orderBy:orderBy track by $index" class="device" ng-class="{'active': device.id == states.activeSched}" ng-click="states.activeSched=device.id" ng-class-even="'even'" ng-class-odd="'odd'">
-                                                    <!-- 20170529 by sam <td>{{device.name}}</td> -->
-                                                    <!-- 20170529 by sam   <td>{{device.symbolicName}}</td> -->
-                                                    <td>00:10</td>
-                                                    <td>Instant Msg {{device.id | number }}</td>
-                                                    <!-- 20170529 by sam  <td>{{device.displayValue}}</td> -->
-                                                    <!-- 20170529 by sam  <td>{{device.PaMessage}}</td>	 -->
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <!-- 20170607 by sam  TODO trigger an action in C++ by addMethodHandler -->
-                                    </div>
+                                   	<div id="table-wrapper">
+  									<div id="table-scroll">
+	                                    <div class="groupbox">
+	                                        <table class="list" style="width: 100%;padding-right: -6px">
+	                                            <thead>
+	                                                <tr>
+	                                                    <!-- 20170529 by sam  <th ng-click="setOrderBy('name')" class="list-sortable">Name</th>  -->
+	                                                    <!-- 20170529 by sam  <th ng-click="setOrderBy('symbolicName')" class="list-sortable">Message Type</th> -->
+	                                                    <th ng-click="setOrderBy('id')" class="list-sortable">TIME</th>
+	                                                    <th ng-click="setOrderBy('physicalQuantity')" class="list-sortable">Message ID</th>
+	                                                    <!-- 20170529 by sam  <th>State/Value</th>	-->
+	                                                    <!-- 20170529 by sam  <th>TODO sentPaMessage()</th> -->
+	                                                </tr>
+	                                            </thead>                                             
+	                                            <tbody class="selection">
+	                                                <tr ng-repeat="device in devices | orderBy:orderBy track by $index" class="device" ng-class="{'active': device.id == states.activeSched}" ng-click="states.activeSched=device.id" ng-class-even="'even'" ng-class-odd="'odd'">
+	                                                    <!-- 20170529 by sam <td>{{device.name}}</td> -->
+	                                                    <!-- 20170529 by sam   <td>{{device.symbolicName}}</td> -->
+	                                                    <td>00:10</td>
+	                                                    <td>Instant Msg {{device.id | number }}</td>
+	                                                    <!-- 20170529 by sam  <td>{{device.displayValue}}</td> -->
+	                                                    <!-- 20170529 by sam  <td>{{device.PaMessage}}</td>	 -->
+	                                                </tr>
+	                                            </tbody>
+	                                        </table>
+	                                        <!-- 20170607 by sam  TODO trigger an action in C++ by addMethodHandler -->
+	                                    </div>
+	                                </div>
+	                                </div>
                                     <!-- 20170807 by sam  to add customized schedTime -->
                                     <button ng-click="sendPaMessage(states.activeItem, schedTime, zoneCodeV, msgCodeValue)" type="button" class="btn btn-default">SAVE</button>
                                     <button type="button" class="btn btn-default">DELETE</button>

@@ -8,7 +8,9 @@ if (!session || !session.authenticated)
 
 var devices = [];
 
-var deviceRefs = serviceRegistry.find('io.macchina.device != ""');
+/** TODO instant message from 8 to 100 **/
+/** var deviceRefs = serviceRegistry.find('io.macchina.device != ""');	**/
+var deviceRefs = serviceRegistry.find('io.macchina.instancemsg != ""');
 for (var i = 0; i < deviceRefs.length; i++)
 {
 	var deviceRef = deviceRefs[i];
