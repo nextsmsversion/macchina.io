@@ -10,7 +10,7 @@ BUNDLE_TOOL = $(POCO_BASE)/OSP/BundleCreator/$(POCO_HOST_BINDIR)/bundle
 
 include $(POCO_BASE)/build/rules/global
 
-objects = UrlPa
+objects = UrlPa SmsPaDefine
 
 target         = com.appinf.osp.url-pa
 target_version = 1
